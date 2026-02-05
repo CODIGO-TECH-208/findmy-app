@@ -1,8 +1,39 @@
-# Welcome to your Lovable project
+# Welcome to FindMy - Campus Lost & Found Platform
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+
+## Overview
+
+FindMy is a comprehensive lost and found platform designed for campus communities. It helps students and staff report lost items, browse found items, claim items, and communicate with other users.
+
+## Features
+
+### User Features
+
+- **Browse Items**: View lost and found items with filtering options
+- **Post Items**: Report lost or found items with images and details
+- **Claims System**: Submit claims for found items
+- **Messaging**: Communicate with other users about items
+- **Profile Management**: Manage your account and view your items
+
+### Admin Portal
+
+A powerful admin interface for platform management. [See full documentation](./ADMIN_PORTAL.md)
+
+**Admin Login Credentials**:
+
+- Email: `admin@ug.edu.gh`
+- Password: `admin123`
+
+**Admin Features**:
+
+- Dashboard with platform statistics
+- User management and verification
+- Items management with status control
+- Claims review and approval system
+- Analytics and reports
 
 ## How can I edit this code?
 

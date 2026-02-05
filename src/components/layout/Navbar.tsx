@@ -11,11 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, Menu, X, Search, Plus, User, LogOut, Settings } from "lucide-react";
+import { Bell, Menu, X, Search, Plus, User, LogOut, Settings, Shield } from "lucide-react";
 import logo from "@/assets/logo.jpg";
 
 export function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,11 +47,10 @@ export function Navbar() {
               <Link
                 key={link.href}
                 to={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location.pathname === link.href
+                className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.href
                     ? "text-primary"
                     : "text-muted-foreground"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -108,6 +107,12 @@ export function Navbar() {
                       <Search className="mr-2 h-4 w-4" />
                       My Claims
                     </DropdownMenuItem>
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        Admin Portal
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => navigate("/settings")}>
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
@@ -151,11 +156,10 @@ export function Navbar() {
                     <Link
                       key={link.href}
                       to={link.href}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        location.pathname === link.href
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === link.href
                           ? "bg-accent text-accent-foreground"
                           : "hover:bg-muted"
-                      }`}
+                        }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {link.label}

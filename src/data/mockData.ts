@@ -8,6 +8,7 @@ export interface User {
   avatar?: string;
   memberSince: string;
   isVerified: boolean;
+  role?: "user" | "admin";
 }
 
 export interface Item {
@@ -112,6 +113,7 @@ export const mockUsers: User[] = [
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-01-15",
     isVerified: true,
+    role: "user",
   },
   {
     id: "user-2",
@@ -121,6 +123,7 @@ export const mockUsers: User[] = [
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-02-20",
     isVerified: true,
+    role: "user",
   },
   {
     id: "user-3",
@@ -130,6 +133,7 @@ export const mockUsers: User[] = [
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-03-10",
     isVerified: false,
+    role: "user",
   },
   {
     id: "user-4",
@@ -139,6 +143,17 @@ export const mockUsers: User[] = [
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-01-25",
     isVerified: true,
+    role: "user",
+  },
+  {
+    id: "admin-1",
+    name: "Admin User",
+    email: "admin@ug.edu.gh",
+    studentId: "ADMIN001",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    memberSince: "2023-01-01",
+    isVerified: true,
+    role: "admin",
   },
 ];
 
