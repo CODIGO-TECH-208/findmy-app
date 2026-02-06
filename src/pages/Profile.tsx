@@ -81,9 +81,9 @@ export default function Profile() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-muted-foreground mb-1">{displayUser.email}</p>
+                <p className="text-muted-foreground mb-1">{displayUser.phone}</p>
                 <p className="text-sm text-muted-foreground">
-                  Student ID: {displayUser.studentId} • Member since{" "}
+                  Member since{" "}
                   {format(new Date(displayUser.memberSince), "MMMM yyyy")}
                 </p>
               </div>

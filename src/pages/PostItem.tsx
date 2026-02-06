@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Formik, Form, Field } from "formik";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,19 @@ export default function PostItem() {
   const initialType = searchParams.get("type") as "lost" | "found" || "lost";
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+
+  // Redirect to register if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign up required",
+        description: "Please create an account to post an item.",
+        variant: "destructive",
+      });
+      navigate("/register");
+    }
+  }, [isAuthenticated, navigate, toast]);
 
   const [itemType, setItemType] = useState<"lost" | "found">(initialType);
   const [images, setImages] = useState<string[]>([]);

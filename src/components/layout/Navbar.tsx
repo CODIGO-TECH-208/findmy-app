@@ -95,7 +95,7 @@ export function Navbar() {
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-0.5">
                         <p className="text-sm font-medium">{user?.name}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <p className="text-xs text-muted-foreground">{user?.phone}</p>
                       </div>
                     </div>
                     <DropdownMenuSeparator />

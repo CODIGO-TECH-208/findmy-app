@@ -1,9 +1,10 @@
 import * as Yup from "yup";
 
 export const loginSchema = Yup.object({
-  email: Yup.string()
-    .email("Please enter a valid email")
-    .required("Email is required"),
+  phone: Yup.string()
+    .trim()
+    .required("Phone number is required")
+    .matches(/^0[2-5][0-9]{8}$/, "Please enter a valid Ghana phone number"),
   password: Yup.string()
     .required("Password is required"),
 });
@@ -13,15 +14,10 @@ export const registerSchema = Yup.object({
     .trim()
     .required("Name is required")
     .max(100, "Name must be less than 100 characters"),
-  studentId: Yup.string()
+  phone: Yup.string()
     .trim()
-    .required("Student ID is required")
-    .matches(/^\d{8}$/, "Student ID must be 8 digits"),
-  email: Yup.string()
-    .trim()
-    .email("Please enter a valid email")
-    .required("Email is required")
-    .max(255, "Email must be less than 255 characters"),
+    .required("Phone number is required")
+    .matches(/^0[2-5][0-9]{8}$/, "Please enter a valid Ghana phone number (e.g., 0241234567)"),
   password: Yup.string()
     .required("Password is required")
     .min(8, "Password must be at least 8 characters"),

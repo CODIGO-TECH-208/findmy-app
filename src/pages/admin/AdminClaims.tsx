@@ -151,7 +151,7 @@ const AdminClaims = () => {
                                                 <div>
                                                     <p className="font-medium text-sm">{claim.user.name}</p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        {claim.user.studentId}
+                                                        {claim.user.phone}
                                                     </p>
                                                 </div>
                                             </div>
@@ -261,10 +261,7 @@ const AdminClaims = () => {
                                     <div>
                                         <p className="font-medium">{selectedClaim.user.name}</p>
                                         <p className="text-sm text-muted-foreground">
-                                            {selectedClaim.user.email}
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            Student ID: {selectedClaim.user.studentId}
+                                            {selectedClaim.user.phone}
                                         </p>
                                     </div>
                                 </div>

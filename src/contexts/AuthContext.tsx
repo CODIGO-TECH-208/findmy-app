@@ -12,8 +12,7 @@ interface AuthContextType {
 
 interface RegisterData {
   name: string;
-  email: string;
-  studentId: string;
+  phone: string;
   password: string;
 }
 
@@ -22,13 +21,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (phone: string, password: string): Promise<boolean> => {
     // Mock login - in production, this would call an API
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    if (email && password) {
+    if (phone && password) {
       // Check if admin login
-      if (email === "admin@ug.edu.gh" && password === "admin123") {
+      if (phone === "0241000000" && password === "admin123") {
         const adminUser = mockUsers.find(u => u.role === "admin");
         if (adminUser) {
           setUser(adminUser);
@@ -46,12 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Mock registration
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    if (data.email && data.password && data.name && data.studentId) {
+    if (data.phone && data.password && data.name) {
       const newUser: User = {
         id: `user-${Date.now()}`,
         name: data.name,
-        email: data.email,
-        studentId: data.studentId,
+        phone: data.phone,
         memberSince: new Date().toISOString().split("T")[0],
         isVerified: false,
       };
