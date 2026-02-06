@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,24 +10,45 @@ import { mockConversations, mockMessages, currentUser, Message } from "@/data/mo
 import { cn } from "@/lib/utils";
 import { Search, Send, ImagePlus, Check, CheckCheck, ArrowLeft } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function Messages() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(
-    mockConversations[0]?.id || null
-  );
-  const [messageInput, setMessageInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showMobileChat, setShowMobileChat] = useState(false);
+  // Zustand store hooks
+  const selectedConversation = useMessageStore((state) => state.selectedConversationId);
+  const setSelectedConversation = useMessageStore((state) => state.setSelectedConversation);
+  const messageInput = useMessageStore((state) => state.messageInput);
+  const setMessageInput = useMessageStore((state) => state.setMessageInput);
+  const searchQuery = useMessageStore((state) => state.searchQuery);
+  const setSearchQuery = useMessageStore((state) => state.setSearchQuery);
+  const showMobileChat = useMessageStore((state) => state.showMobileChat);
+  const setShowMobileChat = useMessageStore((state) => state.setShowMobileChat);
+  const conversations = useMessageStore((state) => state.conversations);
+  const messages = useMessageStore((state) => state.messages);
+  const getFilteredConversations = useMessageStore((state) => state.getFilteredConversations);
+  const getConversationMessages = useMessageStore((state) => state.getConversationMessages);
+  const sendMessage = useMessageStore((state) => state.sendMessage);
+  const initializeStore = useMessageStore((state) => state.initializeStore);
+  const markConversationAsRead = useMessageStore((state) => state.markConversationAsRead);
 
-  const activeConversation = mockConversations.find(
+  // Initialize store with mock data on mount
+  useEffect(() => {
+    initializeStore(mockConversations, mockMessages);
+  }, [initializeStore]);
+
+  const activeConversation = conversations.find(
     (c) => c.id === selectedConversation
   );
-  const conversationMessages = mockMessages.filter(
-    (m) => m.conversationId === selectedConversation
-  );
+  const conversationMessages = getConversationMessages(selectedConversation || "");
   const otherParticipant = activeConversation?.participants.find(
     (p) => p.id !== currentUser.id
   );
+
+  // Mark conversation as read when it's selected
+  useEffect(() => {
+    if (selectedConversation) {
+      markConversationAsRead(selectedConversation);
+    }
+  }, [selectedConversation, markConversationAsRead]);
 
   const formatMessageTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -51,26 +72,21 @@ export default function Messages() {
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!messageInput.trim()) return;
-    // In a real app, this would send the message
-    setMessageInput("");
+    await sendMessage(selectedConversation || "", messageInput, currentUser.id);
   };
 
   const handleSelectConversation = (convId: string) => {
     setSelectedConversation(convId);
-    setShowMobileChat(true);
   };
 
   const handleBackToList = () => {
     setShowMobileChat(false);
   };
 
-  // Filter conversations
-  const filteredConversations = mockConversations.filter((conv) => {
-    const other = conv.participants.find((p) => p.id !== currentUser.id);
-    return other?.name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // Filter conversations using store selector
+  const filteredConversations = getFilteredConversations(currentUser.id);
 
   return (
     <Layout>
