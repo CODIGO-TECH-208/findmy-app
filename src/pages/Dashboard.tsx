@@ -156,13 +156,12 @@ export default function Dashboard() {
                     className="flex items-start gap-3 pb-3 border-b last:border-0"
                   >
                     <div
-                      className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-                        activity.status === "success"
+                      className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${activity.status === "success"
                           ? "bg-success/10 text-success"
                           : activity.status === "pending"
-                          ? "bg-warning/10 text-warning"
-                          : "bg-primary/10 text-primary"
-                      }`}
+                            ? "bg-warning/10 text-warning"
+                            : "bg-primary/10 text-primary"
+                        }`}
                     >
                       {activity.status === "success" ? (
                         <CheckCircle className="h-4 w-4" />
@@ -220,9 +219,8 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2 mt-1">
                         <Badge
                           variant={item.type === "lost" ? "destructive" : "default"}
-                          className={`text-xs ${
-                            item.type === "found" ? "bg-success" : ""
-                          }`}
+                          className={`text-xs ${item.type === "found" ? "bg-success" : ""
+                            }`}
                         >
                           {item.type}
                         </Badge>
