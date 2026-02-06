@@ -27,10 +27,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    if (!isAdmin) {
-        navigate("/");
-        return null;
-    }
+    // Redirect is now handled by AdminRoute wrapper
+    // This component only renders when user is already verified as admin
 
     const handleLogout = () => {
         logout();

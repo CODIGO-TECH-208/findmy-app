@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return true;
         }
       }
-      // Regular user login
+      // Regular user login - use current user
       setUser(currentUser);
       return true;
     }
