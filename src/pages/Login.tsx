@@ -19,13 +19,13 @@ export default function Login() {
   const { toast } = useToast();
 
   const initialValues: LoginFormValues = {
-    email: "",
+    phone: "",
     password: "",
   };
 
   const handleSubmit = async (values: LoginFormValues) => {
     try {
-      const success = await login(values.email, values.password);
+      const success = await login(values.phone, values.password);
       if (success) {
         toast({
           title: "Welcome back!",
@@ -74,17 +74,17 @@ export default function Login() {
               {({ errors, touched, isSubmitting }) => (
                 <Form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="phone">Phone Number</Label>
                     <Field
                       as={Input}
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your.email@st.ug.edu.gh"
-                      className={errors.email && touched.email ? "border-destructive" : ""}
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="0241234567"
+                      className={errors.phone && touched.phone ? "border-destructive" : ""}
                     />
-                    {errors.email && touched.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
+                    {errors.phone && touched.phone && (
+                      <p className="text-sm text-destructive">{errors.phone}</p>
                     )}
                   </div>
                   <div className="space-y-2">

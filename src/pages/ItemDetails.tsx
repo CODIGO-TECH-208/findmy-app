@@ -39,9 +39,22 @@ import { claimSchema, ClaimFormValues } from "@/lib/validationSchemas";
 export default function ItemDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [claimDialogOpen, setClaimDialogOpen] = useState(false);
+
+  const handleClaimClick = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign up required",
+        description: "Please create an account to claim an item.",
+        variant: "destructive",
+      });
+      navigate("/register");
+      return;
+    }
+    setClaimDialogOpen(true);
+  };
 
   const item = mockItems.find((i) => i.id === id);
   const category = CATEGORIES.find((c) => c.value === item?.category);
@@ -211,13 +224,12 @@ export default function ItemDetails() {
                 </Button>
               </div>
             ) : item.type === "found" && item.status === "active" ? (
-              <Dialog open={claimDialogOpen} onOpenChange={setClaimDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full gap-2" size="lg">
-                    <CheckCircle className="h-5 w-5" />
-                    Claim This Item
-                  </Button>
-                </DialogTrigger>
+              <>
+                <Button className="w-full gap-2" size="lg" onClick={handleClaimClick}>
+                  <CheckCircle className="h-5 w-5" />
+                  Claim This Item
+                </Button>
+                <Dialog open={claimDialogOpen} onOpenChange={setClaimDialogOpen}>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Claim This Item</DialogTitle>
@@ -289,6 +301,7 @@ export default function ItemDetails() {
                   </Formik>
                 </DialogContent>
               </Dialog>
+              </>
             ) : item.type === "lost" ? (
               <Button className="w-full gap-2" size="lg" asChild>
                 <Link to={`/messages?item=${item.id}`}>

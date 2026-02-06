@@ -20,8 +20,7 @@ export default function Register() {
 
   const initialValues: RegisterFormValues = {
     name: "",
-    studentId: "",
-    email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   };
@@ -30,8 +29,7 @@ export default function Register() {
     try {
       const success = await register({
         name: values.name,
-        email: values.email,
-        studentId: values.studentId,
+        phone: values.phone,
         password: values.password,
       });
 
@@ -97,31 +95,17 @@ export default function Register() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="studentId">Student ID</Label>
+                    <Label htmlFor="phone">Phone Number</Label>
                     <Field
                       as={Input}
-                      id="studentId"
-                      name="studentId"
-                      placeholder="10894521"
-                      className={errors.studentId && touched.studentId ? "border-destructive" : ""}
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="0241234567"
+                      className={errors.phone && touched.phone ? "border-destructive" : ""}
                     />
-                    {errors.studentId && touched.studentId && (
-                      <p className="text-sm text-destructive">{errors.studentId}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Field
-                      as={Input}
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your.email@st.ug.edu.gh"
-                      className={errors.email && touched.email ? "border-destructive" : ""}
-                    />
-                    {errors.email && touched.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
+                    {errors.phone && touched.phone && (
+                      <p className="text-sm text-destructive">{errors.phone}</p>
                     )}
                   </div>
 

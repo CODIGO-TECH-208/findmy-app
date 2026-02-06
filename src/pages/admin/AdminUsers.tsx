@@ -35,8 +35,7 @@ const AdminUsers = () => {
     const filteredUsers = users.filter(
         (user) =>
             user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.studentId.toLowerCase().includes(searchQuery.toLowerCase())
+            user.phone.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleVerifyUser = (userId: string) => {
@@ -97,7 +96,7 @@ const AdminUsers = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>User</TableHead>
-                                <TableHead>Student ID</TableHead>
+                                <TableHead>Phone</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Member Since</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -127,12 +126,12 @@ const AdminUsers = () => {
                                                 <div>
                                                     <p className="font-medium">{user.name}</p>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {user.email}
+                                                        {user.phone}
                                                     </p>
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{user.studentId}</TableCell>
+                                        <TableCell>{user.phone}</TableCell>
                                         <TableCell>
                                             {user.isVerified ? (
                                                 <Badge className="bg-green-100 text-green-700 hover:bg-green-100">

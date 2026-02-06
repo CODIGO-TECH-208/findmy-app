@@ -3,8 +3,7 @@
 export interface User {
   id: string;
   name: string;
-  email: string;
-  studentId: string;
+  phone: string;
   avatar?: string;
   memberSince: string;
   isVerified: boolean;
@@ -108,8 +107,7 @@ export const mockUsers: User[] = [
   {
     id: "user-1",
     name: "Kwame Asante",
-    email: "kwame.asante@st.ug.edu.gh",
-    studentId: "10894521",
+    phone: "0241234567",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-01-15",
     isVerified: true,
@@ -118,8 +116,7 @@ export const mockUsers: User[] = [
   {
     id: "user-2",
     name: "Ama Serwaa",
-    email: "ama.serwaa@st.ug.edu.gh",
-    studentId: "10894522",
+    phone: "0551234568",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-02-20",
     isVerified: true,
@@ -128,8 +125,7 @@ export const mockUsers: User[] = [
   {
     id: "user-3",
     name: "Kofi Mensah",
-    email: "kofi.mensah@st.ug.edu.gh",
-    studentId: "10894523",
+    phone: "0201234569",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-03-10",
     isVerified: false,
@@ -138,8 +134,7 @@ export const mockUsers: User[] = [
   {
     id: "user-4",
     name: "Abena Osei",
-    email: "abena.osei@st.ug.edu.gh",
-    studentId: "10894524",
+    phone: "0271234570",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     memberSince: "2024-01-25",
     isVerified: true,
@@ -148,8 +143,7 @@ export const mockUsers: User[] = [
   {
     id: "admin-1",
     name: "Admin User",
-    email: "admin@ug.edu.gh",
-    studentId: "ADMIN001",
+    phone: "0241000000",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     memberSince: "2023-01-01",
     isVerified: true,
