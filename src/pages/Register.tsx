@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Formik, Form, Field } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,69 +8,31 @@ import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { registerSchema, RegisterFormValues } from "@/lib/validationSchemas";
 import logo from "@/assets/logo.jpg";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
+  const [showPassword, setShowPassword] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const initialValues: RegisterFormValues = {
     name: "",
     studentId: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { register } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.studentId.trim()) {
-      newErrors.studentId = "Student ID is required";
-    } else if (!/^\d{8}$/.test(formData.studentId)) {
-      newErrors.studentId = "Student ID must be 8 digits";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!formData.email.includes("@")) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-
+  const handleSubmit = async (values: RegisterFormValues) => {
     try {
       const success = await register({
-        name: formData.name,
-        email: formData.email,
-        studentId: formData.studentId,
-        password: formData.password,
+        name: values.name,
+        email: values.email,
+        studentId: values.studentId,
+        password: values.password,
       });
 
       if (success) {
@@ -92,16 +54,6 @@ export default function Register() {
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -123,111 +75,114 @@ export default function Register() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Kwame Asante"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={errors.name ? "border-destructive" : ""}
-                />
-                {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name}</p>
-                )}
-              </div>
+            <Formik
+              initialValues={initialValues}
+              validationSchema={registerSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ errors, touched, isSubmitting }) => (
+                <Form className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Field
+                      as={Input}
+                      id="name"
+                      name="name"
+                      placeholder="Kwame Asante"
+                      className={errors.name && touched.name ? "border-destructive" : ""}
+                    />
+                    {errors.name && touched.name && (
+                      <p className="text-sm text-destructive">{errors.name}</p>
+                    )}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="studentId">Student ID</Label>
-                <Input
-                  id="studentId"
-                  name="studentId"
-                  placeholder="10894521"
-                  value={formData.studentId}
-                  onChange={handleChange}
-                  className={errors.studentId ? "border-destructive" : ""}
-                />
-                {errors.studentId && (
-                  <p className="text-sm text-destructive">{errors.studentId}</p>
-                )}
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="studentId">Student ID</Label>
+                    <Field
+                      as={Input}
+                      id="studentId"
+                      name="studentId"
+                      placeholder="10894521"
+                      className={errors.studentId && touched.studentId ? "border-destructive" : ""}
+                    />
+                    {errors.studentId && touched.studentId && (
+                      <p className="text-sm text-destructive">{errors.studentId}</p>
+                    )}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="your.email@st.ug.edu.gh"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={errors.email ? "border-destructive" : ""}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Field
+                      as={Input}
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="your.email@st.ug.edu.gh"
+                      className={errors.email && touched.email ? "border-destructive" : ""}
+                    />
+                    {errors.email && touched.email && (
+                      <p className="text-sm text-destructive">{errors.email}</p>
+                    )}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={errors.password ? "border-destructive" : ""}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Field
+                        as={Input}
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className={errors.password && touched.password ? "border-destructive" : ""}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                    {errors.password && touched.password && (
+                      <p className="text-sm text-destructive">{errors.password}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Field
+                      as={Input}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      className={errors.confirmPassword && touched.confirmPassword ? "border-destructive" : ""}
+                    />
+                    {errors.confirmPassword && touched.confirmPassword && (
+                      <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                    )}
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
                     ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      "Create account"
                     )}
                   </Button>
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={errors.confirmPassword ? "border-destructive" : ""}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                )}
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create account"
-                )}
-              </Button>
-            </form>
+                </Form>
+              )}
+            </Formik>
 
             <div className="mt-6 text-center text-sm">
               <span className="text-muted-foreground">Already have an account? </span>

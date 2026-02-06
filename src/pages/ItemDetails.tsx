@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { Formik, Form, Field } from "formik";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,20 +34,23 @@ import {
   Loader2,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
+import { claimSchema, ClaimFormValues } from "@/lib/validationSchemas";
 
 export default function ItemDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [claimReason, setClaimReason] = useState("");
-  const [claimDetails, setClaimDetails] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [claimDialogOpen, setClaimDialogOpen] = useState(false);
 
   const item = mockItems.find((i) => i.id === id);
   const category = CATEGORIES.find((c) => c.value === item?.category);
   const isOwner = item?.userId === currentUser.id;
+
+  const initialClaimValues: ClaimFormValues = {
+    reason: "",
+    details: "",
+  };
 
   if (!item) {
     return (
@@ -62,22 +66,9 @@ export default function ItemDetails() {
     );
   }
 
-  const handleClaimSubmit = async () => {
-    if (!claimReason.trim()) {
-      toast({
-        title: "Please provide a reason",
-        description: "Tell us why you believe this item belongs to you.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
+  const handleClaimSubmit = async (values: ClaimFormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
     setClaimDialogOpen(false);
-    setClaimReason("");
-    setClaimDetails("");
 
     toast({
       title: "Claim submitted!",
@@ -235,50 +226,67 @@ export default function ItemDetails() {
                       review your claim.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reason">
-                        Why do you believe this is yours? *
-                      </Label>
-                      <Textarea
-                        id="reason"
-                        placeholder="Describe identifying features, when/where you lost it..."
-                        value={claimReason}
-                        onChange={(e) => setClaimReason(e.target.value)}
-                        rows={3}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="details">
-                        Additional details (optional)
-                      </Label>
-                      <Textarea
-                        id="details"
-                        placeholder="Any other information that could help verify ownership..."
-                        value={claimDetails}
-                        onChange={(e) => setClaimDetails(e.target.value)}
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setClaimDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button onClick={handleClaimSubmit} disabled={isSubmitting}>
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Submitting...
-                        </>
-                      ) : (
-                        "Submit Claim"
-                      )}
-                    </Button>
-                  </DialogFooter>
+                  <Formik
+                    initialValues={initialClaimValues}
+                    validationSchema={claimSchema}
+                    onSubmit={handleClaimSubmit}
+                  >
+                    {({ errors, touched, isSubmitting }) => (
+                      <Form className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="reason">
+                            Why do you believe this is yours? *
+                          </Label>
+                          <Field
+                            as={Textarea}
+                            id="reason"
+                            name="reason"
+                            placeholder="Describe identifying features, when/where you lost it..."
+                            rows={3}
+                            className={errors.reason && touched.reason ? "border-destructive" : ""}
+                          />
+                          {errors.reason && touched.reason && (
+                            <p className="text-sm text-destructive">{errors.reason}</p>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="details">
+                            Additional details (optional)
+                          </Label>
+                          <Field
+                            as={Textarea}
+                            id="details"
+                            name="details"
+                            placeholder="Any other information that could help verify ownership..."
+                            rows={2}
+                            className={errors.details && touched.details ? "border-destructive" : ""}
+                          />
+                          {errors.details && touched.details && (
+                            <p className="text-sm text-destructive">{errors.details}</p>
+                          )}
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setClaimDialogOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Submitting...
+                              </>
+                            ) : (
+                              "Submit Claim"
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </Form>
+                    )}
+                  </Formik>
                 </DialogContent>
               </Dialog>
             ) : item.type === "lost" ? (
