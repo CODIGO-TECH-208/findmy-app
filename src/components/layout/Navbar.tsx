@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,14 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, Menu, X, Search, Plus, User, LogOut, Settings, Shield } from "lucide-react";
+import { Plus, User, LogOut, Settings, Shield, Search } from "lucide-react";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import logo from "@/assets/logo.jpg";
 
 export function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -38,7 +36,7 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="FindMy" className="h-10 w-10 rounded-lg object-cover" />
-            <span className="text-xl font-bold text-foreground">FindMy</span>
+            <span className="text-xl font-display font-bold text-foreground">FindMy</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -72,12 +70,7 @@ export function Navbar() {
                 </Button>
 
                 {/* Notifications */}
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                    3
-                  </Badge>
-                </Button>
+                <NotificationDropdown />
 
                 {/* User Menu */}
                 <DropdownMenu>
@@ -133,60 +126,8 @@ export function Navbar() {
                 <Button onClick={() => navigate("/register")}>Sign up</Button>
               </div>
             )}
-
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t py-4 animate-fade-in">
-            <div className="flex flex-col gap-2">
-              {isAuthenticated ? (
-                <>
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      to={link.href}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === link.href
-                          ? "bg-accent text-accent-foreground"
-                          : "hover:bg-muted"
-                        }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                  <Button
-                    className="mt-2 gap-2"
-                    onClick={() => {
-                      navigate("/post");
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Post Item
-                  </Button>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2 pt-2">
-                  <Button variant="outline" onClick={() => navigate("/login")}>
-                    Log in
-                  </Button>
-                  <Button onClick={() => navigate("/register")}>Sign up</Button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );
