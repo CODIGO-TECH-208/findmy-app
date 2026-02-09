@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
     LayoutDashboard,
     Users,
@@ -175,6 +176,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
             {/* Main Content Area */}
             <div className="flex flex-1 flex-col">
+                {/* Desktop Header */}
+                <header className="hidden h-16 items-center justify-end border-b border-slate-200 bg-white px-6 shadow-sm lg:flex">
+                    <ThemeToggle />
+                </header>
+
                 {/* Mobile Header */}
                 <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm lg:hidden">
                     <div className="flex items-center gap-3">
@@ -197,6 +203,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                             <h1 className="text-lg font-bold text-slate-900">FindMy Admin</h1>
                         </div>
                     </div>
+                    <ThemeToggle />
                 </header>
 
                 {/* Mobile Sidebar */}

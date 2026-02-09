@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus, User, LogOut, Settings, Shield, Search } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import logo from "@/assets/logo.jpg";
 
 export function Navbar() {
@@ -46,8 +47,8 @@ export function Navbar() {
                 key={link.href}
                 to={link.href}
                 className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.href
-                    ? "text-primary"
-                    : "text-muted-foreground"
+                  ? "text-primary"
+                  : "text-muted-foreground"
                   }`}
               >
                 {link.label}
@@ -57,6 +58,9 @@ export function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {isAuthenticated ? (
               <>
                 {/* Post Button */}
