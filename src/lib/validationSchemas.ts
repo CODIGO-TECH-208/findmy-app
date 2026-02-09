@@ -1,5 +1,19 @@
 import * as Yup from "yup";
 
+// Ghana phone number validation
+const ghanaPhoneRegex = /^0[2-5][0-9]{8}$/;
+
+export const profileUpdateSchema = Yup.object().shape({
+  name: Yup.string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be less than 100 characters")
+    .required("Name is required"),
+  phone: Yup.string()
+    .matches(ghanaPhoneRegex, "Please enter a valid Ghana phone number (e.g., 0241234567)")
+    .required("Phone number is required"),
+});
+
 export const loginSchema = Yup.object({
   phone: Yup.string()
     .trim()

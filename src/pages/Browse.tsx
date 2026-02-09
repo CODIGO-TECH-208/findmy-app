@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { mockItems, CATEGORIES, LOCATIONS, Item } from "@/data/mockData";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
@@ -89,7 +90,7 @@ export default function Browse() {
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
             Browse Items
           </h1>
           <p className="text-muted-foreground">
@@ -143,7 +144,10 @@ export default function Browse() {
                       <SelectItem value="all">All Categories</SelectItem>
                       {CATEGORIES.map((cat) => (
                         <SelectItem key={cat.value} value={cat.value}>
-                          {cat.icon} {cat.label}
+                          <span className="flex items-center gap-2">
+                            <CategoryIcon icon={cat.icon} className="h-4 w-4" />
+                            {cat.label}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>

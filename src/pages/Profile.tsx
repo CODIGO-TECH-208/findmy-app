@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { ItemGrid } from "@/components/items/ItemGrid";
-import { mockItems, mockClaims, currentUser } from "@/data/mockData";
+import { ProfileEditDialog } from "@/components/profile/ProfileEditDialog";
+import { mockItems, mockClaims, currentUser, User } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -28,7 +28,8 @@ export default function Profile() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const displayUser = user || currentUser;
+  const [displayUser, setDisplayUser] = useState<User>(user || currentUser);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -48,6 +49,13 @@ export default function Profile() {
     });
   };
 
+  const handleProfileUpdate = (updatedData: Partial<User>) => {
+    setDisplayUser((prev) => ({
+      ...prev,
+      ...updatedData,
+    }));
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -62,13 +70,16 @@ export default function Profile() {
                     {displayUser.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <button className="absolute bottom-0 right-0 h-8 w-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
+                <button 
+                  onClick={() => setEditDialogOpen(true)}
+                  className="absolute bottom-0 right-0 h-8 w-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors"
+                >
                   <Camera className="h-4 w-4" />
                 </button>
               </div>
               <div className="flex-1 text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
-                  <h1 className="text-2xl font-bold text-foreground">
+                  <h1 className="text-2xl font-display font-bold text-foreground">
                     {displayUser.name}
                   </h1>
                   {displayUser.isVerified && (
@@ -87,7 +98,11 @@ export default function Profile() {
                   {format(new Date(displayUser.memberSince), "MMMM yyyy")}
                 </p>
               </div>
-              <Button variant="outline" className="gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setEditDialogOpen(true)}
+              >
                 <Edit className="h-4 w-4" />
                 Edit Profile
               </Button>
@@ -239,6 +254,14 @@ export default function Profile() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Edit Profile Dialog */}
+        <ProfileEditDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          user={displayUser}
+          onUpdate={handleProfileUpdate}
+        />
       </div>
     </Layout>
   );

@@ -71,16 +71,16 @@ export type ItemCategory =
   | "other";
 
 export const CATEGORIES: { value: ItemCategory; label: string; icon: string }[] = [
-  { value: "phones", label: "Phones", icon: "📱" },
-  { value: "id-cards", label: "ID Cards", icon: "🪪" },
-  { value: "bags", label: "Bags", icon: "🎒" },
-  { value: "books", label: "Books", icon: "📚" },
-  { value: "electronics", label: "Electronics", icon: "💻" },
-  { value: "clothing", label: "Clothing", icon: "👕" },
-  { value: "accessories", label: "Accessories", icon: "⌚" },
-  { value: "keys", label: "Keys", icon: "🔑" },
-  { value: "documents", label: "Documents", icon: "📄" },
-  { value: "other", label: "Other", icon: "📦" },
+  { value: "phones", label: "Phones", icon: "smartphone" },
+  { value: "id-cards", label: "ID Cards", icon: "credit-card" },
+  { value: "bags", label: "Bags", icon: "briefcase" },
+  { value: "books", label: "Books", icon: "book-open" },
+  { value: "electronics", label: "Electronics", icon: "laptop" },
+  { value: "clothing", label: "Clothing", icon: "shirt" },
+  { value: "accessories", label: "Accessories", icon: "watch" },
+  { value: "keys", label: "Keys", icon: "key" },
+  { value: "documents", label: "Documents", icon: "file-text" },
+  { value: "other", label: "Other", icon: "package" },
 ];
 
 export const LOCATIONS = [
