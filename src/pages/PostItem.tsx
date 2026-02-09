@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { CATEGORIES, LOCATIONS } from "@/data/mockData";
 import { ArrowLeft, X, Loader2, ImagePlus } from "lucide-react";
 import { postItemSchema, PostItemFormValues } from "@/lib/validationSchemas";
@@ -163,7 +164,10 @@ export default function PostItem() {
                       <SelectContent>
                         {CATEGORIES.map((cat) => (
                           <SelectItem key={cat.value} value={cat.value}>
-                            {cat.icon} {cat.label}
+                            <span className="flex items-center gap-2">
+                              <CategoryIcon icon={cat.icon} className="h-4 w-4" />
+                              {cat.label}
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>

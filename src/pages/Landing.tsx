@@ -47,7 +47,7 @@ export default function Landing() {
               <Sparkles className="h-3 w-3 mr-1" />
               University of Ghana Campus
             </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground mb-6 leading-tight">
               Lost something?{" "}
               <span className="text-primary">Found something?</span>
               <br />
@@ -116,7 +116,7 @@ export default function Landing() {
       <section className="py-16 bg-card">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl font-display font-bold text-foreground mb-4">
               How It Works
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
@@ -146,7 +146,7 @@ export default function Landing() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-foreground">
+              <h2 className="text-2xl font-display font-bold text-foreground">
                 Recently Posted
               </h2>
               <p className="text-muted-foreground">
@@ -171,7 +171,7 @@ export default function Landing() {
       {/* CTA Section */}
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Find What's Yours?</h2>
+          <h2 className="text-3xl font-display font-bold mb-4">Ready to Find What's Yours?</h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
             Join the FindMy community and never lose track of your belongings again.
           </p>
