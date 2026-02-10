@@ -12,7 +12,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Plus, User, LogOut, Settings, Shield, Search } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/findmy-logo.png";
+import textlogo from "@/assets/findmy-text.png";
 
 export function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -36,8 +37,8 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="FindMy" className="h-10 w-10 rounded-lg object-cover" />
-            <span className="text-xl font-display font-bold text-foreground">FindMy</span>
+            <img src={logo} alt="FindMy" className="h-8 md:h-9 w-8 md:w-9 object-cover" />
+            <img src={textlogo} alt="FindMy" className="h-4 md:h-5 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}

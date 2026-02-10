@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { loginSchema, LoginFormValues } from "@/lib/validationSchemas";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/findmy-logo.png";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -51,13 +51,13 @@ export default function Login() {
   return (
     <Layout showMobileNav={false}>
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md border-none shadow-none bg-transparent">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <img
                 src={logo}
                 alt="FindMy"
-                className="h-16 w-16 rounded-xl object-cover"
+                className="size-[85px] object-contain"
               />
             </div>
             <CardTitle className="text-2xl">Welcome back</CardTitle>

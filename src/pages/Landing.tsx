@@ -5,12 +5,45 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Layout } from "@/components/layout/Layout";
 import { ItemCard } from "@/components/items/ItemCard";
 import { mockItems, mockStats } from "@/data/mockData";
-import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
-import logo from "@/assets/logo.jpg";
+import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles, Shield, Users, Bell } from "lucide-react";
+import logo from "@/assets/findmy-logo.png";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const recentItems = mockItems.slice(0, 4);
+  const recentItems = mockItems.slice(0, 6);
+
+  const promoSlides = [
+    {
+      icon: Shield,
+      title: "Safe & Secure",
+      description: "Verified UG students only. Your safety is our priority.",
+      color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    },
+    {
+      icon: Users,
+      title: "Community Driven",
+      description: "Join thousands of students helping each other find lost items.",
+      color: "bg-green-500/10 text-green-600 dark:text-green-400",
+    },
+    {
+      icon: Bell,
+      title: "Instant Notifications",
+      description: "Get alerted immediately when someone finds your item.",
+      color: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+    },
+    {
+      icon: MessageCircle,
+      title: "Easy Communication",
+      description: "Built-in messaging to connect with finders or owners.",
+      color: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+    },
+  ];
 
   const steps = [
     {
@@ -33,14 +66,14 @@ export default function Landing() {
   return (
     <Layout showMobileNav={false}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden gradient-hero">
+      <section className="relative overflow-hidden gradient-hero px-4">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex justify-center mb-6">
               <img
                 src={logo}
                 alt="FindMy Logo"
-                className="h-20 w-20 rounded-2xl shadow-soft object-cover"
+                className="size-[120px] object-contain"
               />
             </div>
             <Badge variant="secondary" className="mb-4">
@@ -112,8 +145,51 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Promotional Carousel */}
+      <section className="py-16 bg-gradient-to-br from-primary/5 to-primary/10 px-4">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold text-foreground mb-4">
+              Why Choose FindMy?
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              The most trusted lost and found platform for UG students
+            </p>
+          </div>
+          <div className="max-w-4xl mx-auto">
+            <Carousel
+              className="w-full"
+              opts={{ align: "start", loop: true }}
+              plugins={[
+                Autoplay({
+                  delay: 3000,
+                }),
+              ]}
+            >
+              <CarouselContent>
+                {promoSlides.map((slide, index) => (
+                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                    <Card className="h-full">
+                      <CardContent className="p-6 flex flex-col items-center text-center h-full">
+                        <div className={`flex items-center justify-center h-16 w-16 rounded-full ${slide.color} mb-4`}>
+                          <slide.icon className="h-8 w-8" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
+                          {slide.title}
+                        </h3>
+                        <p className="text-muted-foreground">{slide.description}</p>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-card px-4">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-display font-bold text-foreground mb-4">
@@ -141,13 +217,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Recent Items */}
-      <section className="py-16">
+      {/* Recent Items Carousel */}
+      <section className="py-16 px-4">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl font-display font-bold text-foreground">
-                Recently Posted
+                Recently Posted Items
               </h2>
               <p className="text-muted-foreground">
                 Latest lost and found items on campus
@@ -160,11 +236,23 @@ export default function Landing() {
               </Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {recentItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </div>
+          <Carousel
+            className="w-full"
+            opts={{ align: "start", loop: true }}
+            plugins={[
+              Autoplay({
+                delay: 4000,
+              }),
+            ]}
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {recentItems.map((item) => (
+                <CarouselItem key={item.id} className="pl-2 md:pl-4 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                  <ItemCard item={item} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </div>
       </section>
 
