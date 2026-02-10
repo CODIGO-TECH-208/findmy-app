@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Plus, User, LogOut, Settings, Shield, Search } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import logo from "@/assets/Findmy-logo.png";
+import logo from "@/assets/findmy-logo.png";
 import textlogo from "@/assets/findmy-text.png";
 
 export function Navbar() {
