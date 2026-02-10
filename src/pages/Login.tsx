@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { loginSchema, LoginFormValues } from "@/lib/validationSchemas";
-import logo from "@/assets/findmy-logo.png";
+import logo from "@/assets/Findmy-logo.png";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
