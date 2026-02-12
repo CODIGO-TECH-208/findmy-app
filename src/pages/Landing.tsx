@@ -4,9 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Layout } from "@/components/layout/Layout";
 import { ItemCard } from "@/components/items/ItemCard";
+import { PromoFlyerCard } from "@/components/items/PromoFlyerCard";
 import { mockItems, mockStats } from "@/data/mockData";
-import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles, Shield, Users, Bell } from "lucide-react";
+import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import logo from "@/assets/findmy-logo.png";
+import promoSafe from "@/assets/promo-safe.jpg";
+import promoCommunity from "@/assets/promo-community.jpg";
+import promoNotifications from "@/assets/promo-notifications.jpg";
+import promoMessaging from "@/assets/promo-messaging.jpg";
 import {
   Carousel,
   CarouselContent,
@@ -20,28 +25,24 @@ export default function Landing() {
 
   const promoSlides = [
     {
-      icon: Shield,
+      image: promoSafe,
       title: "Safe & Secure",
       description: "Verified UG students only. Your safety is our priority.",
-      color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
     },
     {
-      icon: Users,
+      image: promoCommunity,
       title: "Community Driven",
       description: "Join thousands of students helping each other find lost items.",
-      color: "bg-green-500/10 text-green-600 dark:text-green-400",
     },
     {
-      icon: Bell,
+      image: promoNotifications,
       title: "Instant Notifications",
       description: "Get alerted immediately when someone finds your item.",
-      color: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
     },
     {
-      icon: MessageCircle,
+      image: promoMessaging,
       title: "Easy Communication",
       description: "Built-in messaging to connect with finders or owners.",
-      color: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
     },
   ];
 
@@ -169,17 +170,11 @@ export default function Landing() {
               <CarouselContent>
                 {promoSlides.map((slide, index) => (
                   <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                    <Card className="h-full">
-                      <CardContent className="p-6 flex flex-col items-center text-center h-full">
-                        <div className={`flex items-center justify-center h-16 w-16 rounded-full ${slide.color} mb-4`}>
-                          <slide.icon className="h-8 w-8" />
-                        </div>
-                        <h3 className="text-xl font-semibold text-foreground mb-2">
-                          {slide.title}
-                        </h3>
-                        <p className="text-muted-foreground">{slide.description}</p>
-                      </CardContent>
-                    </Card>
+                    <PromoFlyerCard
+                      image={slide.image}
+                      title={slide.title}
+                      description={slide.description}
+                    />
                   </CarouselItem>
                 ))}
               </CarouselContent>
