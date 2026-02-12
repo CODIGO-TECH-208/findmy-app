@@ -8,6 +8,7 @@ import { PromoFlyerCard } from "@/components/items/PromoFlyerCard";
 import { mockItems, mockStats } from "@/data/mockData";
 import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import logo from "@/assets/findmy-logo.png";
+import heroBg from "@/assets/hero-bg.jpg";
 import promoSafe from "@/assets/promo-safe.jpg";
 import promoCommunity from "@/assets/promo-community.jpg";
 import promoNotifications from "@/assets/promo-notifications.jpg";
@@ -67,8 +68,12 @@ export default function Landing() {
   return (
     <Layout showMobileNav={false}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden gradient-hero px-4">
-        <div className="container mx-auto px-4 py-16 md:py-24">
+      <section className="relative overflow-hidden px-4">
+        <div className="absolute inset-0 z-0">
+          <img src={heroBg} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-background/85 dark:bg-background/90" />
+        </div>
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex justify-center mb-6">
               <img
@@ -169,7 +174,7 @@ export default function Landing() {
             >
               <CarouselContent>
                 {promoSlides.map((slide, index) => (
-                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <CarouselItem key={index} className="basis-full md:basis-1/2">
                     <PromoFlyerCard
                       image={slide.image}
                       title={slide.title}
