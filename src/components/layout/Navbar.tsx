@@ -14,6 +14,8 @@ import { NotificationDropdown } from "@/components/notifications/NotificationDro
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import logo from "@/assets/findmy-logo.png";
 import textlogo from "@/assets/findmy-text.png";
+import logo_dark from "@/assets/findmy-logo-dark.png";
+import textlogo_dark from "@/assets/findmy-text-dark.png";
 
 export function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -36,9 +38,14 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex dark:hidden items-center gap-2">
             <img src={logo} alt="FindMy" className="h-8 md:h-9 w-8 md:w-9 object-cover" />
             <img src={textlogo} alt="FindMy" className="h-4 md:h-5 w-auto object-contain" />
+          </Link>
+
+          <Link to="/" className="hidden dark:flex items-center gap-2">
+            <img src={logo_dark} alt="FindMy" className="h-8 md:h-9 w-8 md:w-9 object-cover" />
+            <img src={textlogo_dark} alt="FindMy" className="h-4 md:h-5 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}
