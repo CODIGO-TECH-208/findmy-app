@@ -8,6 +8,7 @@ import { PromoFlyerCard } from "@/components/items/PromoFlyerCard";
 import { mockItems, mockStats } from "@/data/mockData";
 import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import logo from "@/assets/findmy-logo.png";
+import logo_dark from "@/assets/findmy-logo-dark.png";
 import heroBg from "@/assets/hero-bg.jpg";
 import promoSafe from "@/assets/promo-safe.jpg";
 import promoCommunity from "@/assets/promo-community.jpg";
@@ -79,7 +80,12 @@ export default function Landing() {
               <img
                 src={logo}
                 alt="FindMy Logo"
-                className="size-[120px] object-contain"
+                className="size-[120px] dark:hidden object-contain"
+              />
+              <img
+                src={logo_dark}
+                alt="FindMy Logo"
+                className="size-[120px] hidden dark:block object-contain"
               />
             </div>
             <Badge variant="secondary" className="mb-4">
@@ -278,7 +284,8 @@ export default function Landing() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src={logo} alt="FindMy" className="h-8 w-8 rounded-lg object-cover" />
+              <img src={logo_dark} alt="FindMy" className="h-8 w-8 rounded-lg object-cover hidden dark:block" />
+              <img src={logo} alt="FindMy" className="h-8 w-8 rounded-lg object-cover dark:hidden" />
               <span className="font-semibold">FindMy</span>
             </div>
             <p className="text-sm text-muted-foreground">
