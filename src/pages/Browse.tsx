@@ -4,7 +4,7 @@ import { ItemGrid } from "@/components/items/ItemGrid";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -13,12 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CategoryIcon } from "@/components/CategoryIcon";
-import { CATEGORIES, LOCATIONS } from "@/data/mockData";
-import { useDbStore } from "@/stores/dbStore";
+import { mockItems, CATEGORIES, LOCATIONS, Item } from "@/data/mockData";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
 export default function Browse() {
-  const allItems = useDbStore((s) => s.items);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
@@ -27,12 +25,14 @@ export default function Browse() {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredItems = useMemo(() => {
-    let items = [...allItems];
+    let items = [...mockItems];
 
+    // Filter by type
     if (itemType !== "all") {
       items = items.filter((item) => item.type === itemType);
     }
 
+    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       items = items.filter(
@@ -42,20 +42,29 @@ export default function Browse() {
       );
     }
 
+    // Filter by category
     if (selectedCategory !== "all") {
       items = items.filter((item) => item.category === selectedCategory);
     }
 
+    // Filter by location
     if (selectedLocation !== "all") {
       items = items.filter((item) => item.location === selectedLocation);
     }
 
+    // Sort items
     switch (sortBy) {
       case "newest":
-        items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        items.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
         break;
       case "oldest":
-        items.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        items.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
         break;
       case "views":
         items.sort((a, b) => b.views - a.views);
@@ -63,7 +72,7 @@ export default function Browse() {
     }
 
     return items;
-  }, [allItems, searchQuery, selectedCategory, selectedLocation, sortBy, itemType]);
+  }, [searchQuery, selectedCategory, selectedLocation, sortBy, itemType]);
 
   const activeFiltersCount = [
     selectedCategory !== "all",
@@ -79,15 +88,17 @@ export default function Browse() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-6">
+        {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
             Browse Items
           </h1>
           <p className="text-muted-foreground">
-            Search through {allItems.length} items on campus
+            Search through {mockItems.length} items on campus
           </p>
         </div>
 
+        {/* Search and Filters */}
         <div className="mb-6 space-y-4">
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -114,13 +125,21 @@ export default function Browse() {
             </Button>
           </div>
 
+          {/* Filter Panel */}
           {showFilters && (
             <div className="p-4 bg-card rounded-lg border animate-fade-in">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Category</label>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger><SelectValue placeholder="All Categories" /></SelectTrigger>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Category
+                  </label>
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
                       {CATEGORIES.map((cat) => (
@@ -135,21 +154,34 @@ export default function Browse() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Location</label>
-                  <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                    <SelectTrigger><SelectValue placeholder="All Locations" /></SelectTrigger>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Location
+                  </label>
+                  <Select
+                    value={selectedLocation}
+                    onValueChange={setSelectedLocation}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Locations" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Locations</SelectItem>
                       {LOCATIONS.map((loc) => (
-                        <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                        <SelectItem key={loc} value={loc}>
+                          {loc}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Sort By</label>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Sort By
+                  </label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger><SelectValue placeholder="Sort by" /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="newest">Newest First</SelectItem>
                       <SelectItem value="oldest">Oldest First</SelectItem>
@@ -159,7 +191,12 @@ export default function Browse() {
                 </div>
               </div>
               {activeFiltersCount > 0 && (
-                <Button variant="ghost" size="sm" className="mt-4 gap-2" onClick={clearFilters}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-4 gap-2"
+                  onClick={clearFilters}
+                >
                   <X className="h-4 w-4" />
                   Clear all filters
                 </Button>
@@ -168,6 +205,7 @@ export default function Browse() {
           )}
         </div>
 
+        {/* Tabs */}
         <Tabs value={itemType} onValueChange={setItemType} className="mb-6">
           <TabsList>
             <TabsTrigger value="all">All Items</TabsTrigger>
@@ -176,13 +214,18 @@ export default function Browse() {
           </TabsList>
         </Tabs>
 
+        {/* Results Count */}
         <div className="mb-4">
           <p className="text-sm text-muted-foreground">
             Showing {filteredItems.length} item{filteredItems.length !== 1 ? "s" : ""}
           </p>
         </div>
 
-        <ItemGrid items={filteredItems} emptyMessage="No items found. Try adjusting your filters." />
+        {/* Items Grid */}
+        <ItemGrid
+          items={filteredItems}
+          emptyMessage="No items found. Try adjusting your filters."
+        />
       </div>
     </Layout>
   );
