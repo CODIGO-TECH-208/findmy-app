@@ -1,34 +1,25 @@
 import { useState } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { mockUsers } from "@/data/mockData";
+import { useDbStore } from "@/stores/dbStore";
 import { Search, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminUsers = () => {
     const { toast } = useToast();
-    const [users, setUsers] = useState(mockUsers.filter(u => u.role !== "admin"));
+    const users = useDbStore((s) => s.users.filter(u => u.role !== "admin"));
+    const updateUser = useDbStore((s) => s.updateUser);
+    const deleteUser = useDbStore((s) => s.deleteUser);
     const [searchQuery, setSearchQuery] = useState("");
     const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
 
@@ -39,28 +30,21 @@ const AdminUsers = () => {
     );
 
     const handleVerifyUser = (userId: string) => {
-        setUsers((prev) =>
-            prev.map((user) =>
-                user.id === userId ? { ...user, isVerified: !user.isVerified } : user
-            )
-        );
         const user = users.find(u => u.id === userId);
-        toast({
-            title: user?.isVerified ? "User unverified" : "User verified",
-            description: `${user?.name} has been ${user?.isVerified ? "unverified" : "verified"}.`,
-        });
+        if (user) {
+            updateUser(userId, { isVerified: !user.isVerified });
+            toast({
+                title: user.isVerified ? "User unverified" : "User verified",
+                description: `${user.name} has been ${user.isVerified ? "unverified" : "verified"}.`,
+            });
+        }
     };
 
     const handleDeleteUser = () => {
         if (!deleteUserId) return;
-
         const user = users.find(u => u.id === deleteUserId);
-        setUsers((prev) => prev.filter((user) => user.id !== deleteUserId));
-        toast({
-            title: "User deleted",
-            description: `${user?.name} has been removed from the platform.`,
-            variant: "destructive",
-        });
+        deleteUser(deleteUserId);
+        toast({ title: "User deleted", description: `${user?.name} has been removed.`, variant: "destructive" });
         setDeleteUserId(null);
     };
 
@@ -69,28 +53,17 @@ const AdminUsers = () => {
             <div className="space-y-6">
                 <div>
                     <h1 className="text-3xl font-bold">User Management</h1>
-                    <p className="text-muted-foreground">
-                        Manage and verify platform users
-                    </p>
+                    <p className="text-muted-foreground">Manage and verify platform users</p>
                 </div>
 
-                {/* Search Bar */}
                 <div className="flex items-center gap-4">
                     <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                            placeholder="Search users..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9"
-                        />
+                        <Input placeholder="Search users..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                        {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
-                    </div>
+                    <div className="text-sm text-muted-foreground">{filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}</div>
                 </div>
 
-                {/* Users Table */}
                 <div className="rounded-md border">
                     <Table>
                         <TableHeader>
@@ -104,70 +77,27 @@ const AdminUsers = () => {
                         </TableHeader>
                         <TableBody>
                             {filteredUsers.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                        No users found
-                                    </TableCell>
-                                </TableRow>
+                                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No users found</TableCell></TableRow>
                             ) : (
                                 filteredUsers.map((user) => (
                                     <TableRow key={user.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <Avatar>
-                                                    <AvatarImage src={user.avatar} alt={user.name} />
-                                                    <AvatarFallback>
-                                                        {user.name
-                                                            .split(" ")
-                                                            .map((n) => n[0])
-                                                            .join("")}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="font-medium">{user.name}</p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {user.phone}
-                                                    </p>
-                                                </div>
+                                                <Avatar><AvatarImage src={user.avatar} alt={user.name} /><AvatarFallback>{user.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback></Avatar>
+                                                <div><p className="font-medium">{user.name}</p><p className="text-sm text-muted-foreground">{user.phone}</p></div>
                                             </div>
                                         </TableCell>
                                         <TableCell>{user.phone}</TableCell>
                                         <TableCell>
-                                            {user.isVerified ? (
-                                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                                                    Verified
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="secondary">Unverified</Badge>
-                                            )}
+                                            {user.isVerified ? <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Verified</Badge> : <Badge variant="secondary">Unverified</Badge>}
                                         </TableCell>
                                         <TableCell>{user.memberSince}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleVerifyUser(user.id)}
-                                                >
-                                                    {user.isVerified ? (
-                                                        <>
-                                                            <XCircle className="h-4 w-4 mr-1" />
-                                                            Unverify
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <CheckCircle className="h-4 w-4 mr-1" />
-                                                            Verify
-                                                        </>
-                                                    )}
+                                                <Button variant="outline" size="sm" onClick={() => handleVerifyUser(user.id)}>
+                                                    {user.isVerified ? <><XCircle className="h-4 w-4 mr-1" />Unverify</> : <><CheckCircle className="h-4 w-4 mr-1" />Verify</>}
                                                 </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => setDeleteUserId(user.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                                <Button variant="outline" size="sm" onClick={() => setDeleteUserId(user.id)}><Trash2 className="h-4 w-4" /></Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -178,22 +108,10 @@ const AdminUsers = () => {
                 </div>
             </div>
 
-            {/* Delete Confirmation Dialog */}
             <AlertDialog open={!!deleteUserId} onOpenChange={() => setDeleteUserId(null)}>
                 <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete User</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to delete this user? This action cannot be
-                            undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteUser}>
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
+                    <AlertDialogHeader><AlertDialogTitle>Delete User</AlertDialogTitle><AlertDialogDescription>Are you sure? This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDeleteUser}>Delete</AlertDialogAction></AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </AdminLayout>
