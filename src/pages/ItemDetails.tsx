@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { mockItems, CATEGORIES, currentUser } from "@/data/mockData";
+import { createClaim } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -80,13 +81,16 @@ export default function ItemDetails() {
   }
 
   const handleClaimSubmit = async (values: ClaimFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setClaimDialogOpen(false);
-
-    toast({
-      title: "Claim submitted!",
-      description: "The owner will review your claim and respond soon.",
-    });
+    try {
+      await createClaim({ itemId: item!.id, reason: values.reason, details: values.details });
+      setClaimDialogOpen(false);
+      toast({
+        title: "Claim submitted!",
+        description: "The owner will review your claim and respond soon.",
+      });
+    } catch (e: any) {
+      toast({ title: 'Error', description: e?.message || 'Failed to submit claim', variant: 'destructive' });
+    }
   };
 
   const handleShare = () => {

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { createItem } from "@/lib/api";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { CATEGORIES, LOCATIONS } from "@/data/mockData";
 import { ArrowLeft, X, Loader2, ImagePlus } from "lucide-react";
@@ -82,14 +83,30 @@ export default function PostItem() {
   };
 
   const handleSubmit = async (values: PostItemFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    toast({
-      title: "Item posted successfully!",
-      description: `Your ${itemType} item has been listed.`,
-    });
-
-    navigate("/browse");
+    try {
+      const payload = {
+        title: values.title,
+        category: values.category,
+        description: values.description,
+        location: values.location,
+        date: values.date,
+        images,
+        reward: values.reward,
+        type: itemType,
+      };
+      await createItem(payload);
+      toast({
+        title: "Item posted successfully!",
+        description: `Your ${itemType} item has been listed.`,
+      });
+      navigate("/browse");
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message || 'Failed to post item',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

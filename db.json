@@ -1,0 +1,77 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "name": "Kwame Asante",
+      "email": "kwame.asante@example.com",
+      "phone": "0241234567",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      "memberSince": "2024-01-15",
+      "isVerified": true,
+      "role": "user",
+      "createdAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "user-2",
+      "name": "Ama Serwaa",
+      "email": "ama.serwaa@example.com",
+      "phone": "0551234568",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
+      "memberSince": "2024-02-20",
+      "isVerified": true,
+      "role": "user",
+      "createdAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "user-3",
+      "name": "Kofi Mensah",
+      "email": "kofi.mensah@example.com",
+      "phone": "0201234569",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+      "memberSince": "2024-03-10",
+      "isVerified": false,
+      "role": "user",
+      "createdAt": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "admin-1",
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "phone": "0241000000",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      "memberSince": "2023-01-01",
+      "isVerified": true,
+      "role": "admin",
+      "createdAt": "2023-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "Terkperson",
+      "email": "0531547562@example.com",
+      "phone": "0531547562",
+      "password": "$2a$10$optaLGWd1eRffN8UqDLxwudTOpdX0l63ZQ9SklFyL7s./07T2eYMu",
+      "avatar": "",
+      "memberSince": "2026-02-24",
+      "isVerified": false,
+      "role": "user",
+      "createdAt": "2026-02-24T14:33:43.988Z",
+      "id": "users_mm0phely3br5e5"
+    },
+    {
+      "name": "Joel Adjei",
+      "email": "0242649110@example.com",
+      "phone": "0242649110",
+      "password": "$2a$10$z2vFr8Dh7QoqDFqaSZqHd.SZ9XsUMUq1YEoKm.kpMrY3OVXSOfc6m",
+      "avatar": "",
+      "memberSince": "2026-02-24",
+      "isVerified": false,
+      "role": "user",
+      "createdAt": "2026-02-24T14:35:20.880Z",
+      "id": "users_mm0pjhdd75a6p2"
+    }
+  ],
+  "items": [],
+  "messages": [],
+  "notifications": [],
+  "claims": [],
+  "categories": []
+}
