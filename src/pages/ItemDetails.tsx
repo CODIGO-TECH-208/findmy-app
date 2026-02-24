@@ -46,11 +46,11 @@ export default function ItemDetails() {
   const handleClaimClick = () => {
     if (!isAuthenticated) {
       toast({
-        title: "Sign up required",
-        description: "Please create an account to claim an item.",
+        title: "Login required",
+        description: "Please log in to claim this item.",
         variant: "destructive",
       });
-      navigate("/register");
+      navigate("/login");
       return;
     }
     setClaimDialogOpen(true);
@@ -303,11 +303,20 @@ export default function ItemDetails() {
               </Dialog>
               </>
             ) : item.type === "lost" ? (
-              <Button className="w-full gap-2" size="lg" asChild>
-                <Link to={`/messages?item=${item.id}`}>
-                  <MessageSquare className="h-5 w-5" />
-                  I Found This Item
-                </Link>
+              <Button className="w-full gap-2" size="lg" onClick={() => {
+                if (!isAuthenticated) {
+                  toast({
+                    title: "Login required",
+                    description: "Please log in to contact the owner about this item.",
+                    variant: "destructive",
+                  });
+                  navigate("/login");
+                  return;
+                }
+                navigate(`/messages?item=${item.id}`);
+              }}>
+                <MessageSquare className="h-5 w-5" />
+                I Found This Item
               </Button>
             ) : null}
 

@@ -6,7 +6,10 @@ import { Layout } from "@/components/layout/Layout";
 import { ItemCard } from "@/components/items/ItemCard";
 import { PromoFlyerCard } from "@/components/items/PromoFlyerCard";
 import { mockItems, mockStats } from "@/data/mockData";
-import { Search, MapPin, MessageCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import {
+  Search, MapPin, MessageCircle, CheckCircle, ArrowRight,
+  Sparkles, Shield, Users, Zap, ChevronRight
+} from "lucide-react";
 import logo from "@/assets/findmy-logo.png";
 import logo_dark from "@/assets/findmy-logo-dark.png";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -26,140 +29,156 @@ export default function Landing() {
   const recentItems = mockItems.slice(0, 6);
 
   const promoSlides = [
+    { image: promoSafe, title: "Safe & Secure", description: "Verified UG students only. Your safety is our priority." },
+    { image: promoCommunity, title: "Community Driven", description: "Join thousands of students helping each other find lost items." },
+    { image: promoNotifications, title: "Instant Notifications", description: "Get alerted immediately when someone finds your item." },
+    { image: promoMessaging, title: "Easy Communication", description: "Built-in messaging to connect with finders or owners." },
+  ];
+
+  const features = [
     {
-      image: promoSafe,
-      title: "Safe & Secure",
-      description: "Verified UG students only. Your safety is our priority.",
+      icon: Search,
+      title: "Smart Search",
+      description: "Quickly find your items with category filters and location-based search across campus.",
     },
     {
-      image: promoCommunity,
-      title: "Community Driven",
-      description: "Join thousands of students helping each other find lost items.",
+      icon: Shield,
+      title: "Verified & Safe",
+      description: "Only verified UG students can post and claim. Your security is our top priority.",
     },
     {
-      image: promoNotifications,
-      title: "Instant Notifications",
-      description: "Get alerted immediately when someone finds your item.",
-    },
-    {
-      image: promoMessaging,
-      title: "Easy Communication",
-      description: "Built-in messaging to connect with finders or owners.",
+      icon: Zap,
+      title: "Instant Alerts",
+      description: "Get notified immediately when someone finds an item matching your description.",
     },
   ];
 
   const steps = [
-    {
-      icon: Search,
-      title: "Report or Search",
-      description: "Post your lost item or browse found items on campus",
-    },
-    {
-      icon: MessageCircle,
-      title: "Connect",
-      description: "Chat with finders or owners to verify ownership",
-    },
-    {
-      icon: CheckCircle,
-      title: "Reunite",
-      description: "Meet safely on campus to recover your belongings",
-    },
+    { icon: Search, title: "Report or Search", description: "Post your lost item or browse found items on campus", step: "01" },
+    { icon: MessageCircle, title: "Connect", description: "Chat with finders or owners to verify ownership", step: "02" },
+    { icon: CheckCircle, title: "Reunite", description: "Meet safely on campus to recover your belongings", step: "03" },
   ];
 
   return (
     <Layout showMobileNav={false}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-4">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img src={heroBg} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-background/85 dark:bg-background/90" />
         </div>
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="flex justify-center mb-6">
-              <img
-                src={logo}
-                alt="FindMy Logo"
-                className="size-[120px] dark:hidden object-contain"
-              />
-              <img
-                src={logo_dark}
-                alt="FindMy Logo"
-                className="size-[120px] hidden dark:block object-contain"
-              />
+        <div className="container mx-auto px-4 py-20 md:py-28 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="max-w-xl">
+              <Badge variant="secondary" className="mb-6 py-1.5 px-4">
+                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                University of Ghana Campus
+              </Badge>
+              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-display font-bold text-foreground mb-6 leading-[1.1]">
+                Lost something?{" "}
+                <span className="text-primary">We'll help you</span>{" "}
+                find it.
+              </h1>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                The easiest way for UG students to report lost items and
+                find their belongings. Join thousands of students helping each other.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button size="lg" onClick={() => navigate("/register")} className="gap-2 h-12 px-6 rounded-full">
+                  Get Started
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate("/browse")}
+                  className="h-12 px-6 rounded-full"
+                >
+                  Browse Items
+                </Button>
+              </div>
+
+              {/* Mini Stats */}
+              <div className="flex items-center gap-6 mt-10 pt-8 border-t border-border/50">
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{mockStats.itemsRecovered.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Items Recovered</p>
+                </div>
+                <div className="w-px h-10 bg-border" />
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{mockStats.registeredUsers.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Students</p>
+                </div>
+                <div className="w-px h-10 bg-border" />
+                <div>
+                  <p className="text-2xl font-bold text-primary">{mockStats.successRate}%</p>
+                  <p className="text-xs text-muted-foreground">Success Rate</p>
+                </div>
+              </div>
             </div>
-            <Badge variant="secondary" className="mb-4">
-              <Sparkles className="h-3 w-3 mr-1" />
-              University of Ghana Campus
-            </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground mb-6 leading-tight">
-              Lost something?{" "}
-              <span className="text-primary">Found something?</span>
-              <br />
-              We'll help you reconnect.
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              FindMy is the easiest way for UG students to report lost items and
-              find their belongings. Join thousands of students helping each other.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" onClick={() => navigate("/register")} className="gap-2">
-                Report Lost Item
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate("/register")}
-              >
-                I Found Something
-              </Button>
+
+            {/* Right - Logo & decorative */}
+            <div className="hidden lg:flex items-center justify-center relative">
+              <div className="relative">
+                <div className="absolute -inset-8 rounded-full bg-primary/5 blur-3xl" />
+                <div className="relative bg-card/80 backdrop-blur rounded-3xl p-8 shadow-card border border-border/50">
+                  <img src={logo} alt="FindMy" className="size-40 object-contain dark:hidden" />
+                  <img src={logo_dark} alt="FindMy" className="size-40 object-contain hidden dark:block" />
+                  <div className="mt-4 text-center">
+                    <p className="font-display font-bold text-xl text-foreground">FindMy</p>
+                    <p className="text-sm text-muted-foreground">Campus Lost & Found</p>
+                  </div>
+                </div>
+                {/* Floating badges */}
+                <div className="absolute -top-4 -right-8 bg-success text-success-foreground rounded-full px-3 py-1.5 text-xs font-medium shadow-lg animate-bounce">
+                  {mockStats.activeListings} Active
+                </div>
+                <div className="absolute -bottom-4 -left-6 bg-card border rounded-full px-3 py-1.5 text-xs font-medium shadow-lg flex items-center gap-1.5">
+                  <Users className="h-3 w-3 text-primary" />
+                  {mockStats.registeredUsers.toLocaleString()} users
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Stats */}
-        <div className="container mx-auto px-4 pb-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <p className="text-3xl font-bold text-primary">
-                  {mockStats.itemsRecovered.toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">Items Recovered</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <p className="text-3xl font-bold text-primary">
-                  {mockStats.activeListings}
-                </p>
-                <p className="text-sm text-muted-foreground">Active Listings</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <p className="text-3xl font-bold text-primary">
-                  {mockStats.registeredUsers.toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">Students</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <p className="text-3xl font-bold text-primary">
-                  {mockStats.successRate}%
-                </p>
-                <p className="text-sm text-muted-foreground">Success Rate</p>
-              </CardContent>
-            </Card>
+      {/* Features Section */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-14">
+            <Badge variant="outline" className="mb-4">
+              <Sparkles className="h-3 w-3 mr-1" />
+              Services
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+              What We Do
+            </h2>
+            <div className="w-12 h-1 bg-primary mx-auto rounded-full" />
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {features.map((feature, index) => (
+              <Card key={index} className="group hover:shadow-card hover:-translate-y-1 transition-all border-border/50">
+                <CardContent className="p-6 text-center">
+                  <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-primary/10 text-primary mb-5 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <feature.icon className="h-7 w-7" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <Button variant="link" className="mt-3 text-primary gap-1 p-0 h-auto text-sm">
+                    Learn more <ChevronRight className="h-3 w-3" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Promotional Carousel */}
       <section className="py-16 bg-gradient-to-br from-primary/5 to-primary/10 px-4">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-display font-bold text-foreground mb-4">
               Why Choose FindMy?
@@ -172,20 +191,12 @@ export default function Landing() {
             <Carousel
               className="w-full"
               opts={{ align: "start", loop: true }}
-              plugins={[
-                Autoplay({
-                  delay: 3000,
-                }),
-              ]}
+              plugins={[Autoplay({ delay: 3000 })]}
             >
               <CarouselContent>
                 {promoSlides.map((slide, index) => (
                   <CarouselItem key={index} className="basis-full md:basis-1/2">
-                    <PromoFlyerCard
-                      image={slide.image}
-                      title={slide.title}
-                      description={slide.description}
-                    />
+                    <PromoFlyerCard image={slide.image} title={slide.title} description={slide.description} />
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -195,10 +206,10 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-card px-4">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-display font-bold text-foreground mb-4">
+      <section className="py-20 bg-card px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
               How It Works
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
@@ -207,15 +218,14 @@ export default function Landing() {
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {steps.map((step, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className="relative text-center group">
+                <div className="text-5xl font-display font-bold text-primary/10 mb-2">{step.step}</div>
                 <div className="flex justify-center mb-4">
-                  <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary">
+                  <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                     <step.icon className="h-8 w-8" />
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {step.title}
-                </h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
                 <p className="text-sm text-muted-foreground">{step.description}</p>
               </div>
             ))}
@@ -223,19 +233,17 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Recent Items Carousel */}
+      {/* Recent Items */}
       <section className="py-16 px-4">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl font-display font-bold text-foreground">
                 Recently Posted Items
               </h2>
-              <p className="text-muted-foreground">
-                Latest lost and found items on campus
-              </p>
+              <p className="text-muted-foreground">Latest lost and found items on campus</p>
             </div>
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="rounded-full">
               <Link to="/browse">
                 View All
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -245,11 +253,7 @@ export default function Landing() {
           <Carousel
             className="w-full"
             opts={{ align: "start", loop: true }}
-            plugins={[
-              Autoplay({
-                delay: 4000,
-              }),
-            ]}
+            plugins={[Autoplay({ delay: 4000 })]}
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {recentItems.map((item) => (
@@ -263,9 +267,9 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary text-primary-foreground">
+      <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-display font-bold mb-4">Ready to Find What's Yours?</h2>
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Ready to Find What's Yours?</h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
             Join the FindMy community and never lose track of your belongings again.
           </p>
@@ -273,6 +277,7 @@ export default function Landing() {
             size="lg"
             variant="secondary"
             onClick={() => navigate("/register")}
+            className="rounded-full h-12 px-8"
           >
             Get Started for Free
           </Button>
