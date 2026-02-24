@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import { User, currentUser, mockUsers } from "@/data/mockData";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { User } from "@/data/mockData";
+import { apiLogin, apiRegister, apiLogout } from "@/lib/api";
 
 interface AuthContextType {
   user: User | null;
@@ -21,46 +22,50 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (phone: string, password: string): Promise<boolean> => {
-    // Mock login - in production, this would call an API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  useEffect(() => {
+    // attempt to hydrate user from token on mount
+    // the API returns user on login/register; we keep it in localStorage
+    const raw = localStorage.getItem('fm_user');
+    if (raw) {
+      try {
+        setUser(JSON.parse(raw));
+      } catch {}
+    }
+  }, []);
 
-    if (phone && password) {
-      // Check if admin login
-      if (phone === "0241000000" && password === "admin123") {
-        const adminUser = mockUsers.find(u => u.role === "admin");
-        if (adminUser) {
-          setUser(adminUser);
-          return true;
-        }
+  const login = async (emailOrPhone: string, password: string): Promise<boolean> => {
+    try {
+      const isPhone = /^[0-9+]{6,}$/.test(emailOrPhone);
+      const payload = await apiLogin(isPhone ? { phone: emailOrPhone, password } : { email: emailOrPhone, password });
+      if (payload?.user) {
+        setUser(payload.user);
+        localStorage.setItem('fm_user', JSON.stringify(payload.user));
+        return true;
       }
-      // Regular user login - use current user
-      setUser(currentUser);
-      return true;
+    } catch (e) {
+      return false;
     }
     return false;
   };
 
   const register = async (data: RegisterData): Promise<boolean> => {
-    // Mock registration
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    if (data.phone && data.password && data.name) {
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        name: data.name,
-        phone: data.phone,
-        memberSince: new Date().toISOString().split("T")[0],
-        isVerified: false,
-      };
-      setUser(newUser);
-      return true;
+    try {
+      const payload = await apiRegister({ name: data.name, email: (data as any).email || `${data.phone}@example.com`, password: data.password, phone: data.phone });
+      if (payload?.user) {
+        setUser(payload.user);
+        localStorage.setItem('fm_user', JSON.stringify(payload.user));
+        return true;
+      }
+    } catch (e) {
+      return false;
     }
     return false;
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('fm_user');
+    apiLogout();
   };
 
   return (
