@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { User, currentUser, mockUsers } from "@/data/mockData";
+import { User, mockUsers } from "@/data/mockData";
+import { useDbStore } from "@/stores/dbStore";
 
 interface AuthContextType {
   user: User | null;
@@ -20,9 +21,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const addUser = useDbStore((s) => s.addUser);
+  const setCurrentUserId = useDbStore((s) => s.setCurrentUserId);
 
   const login = async (phone: string, password: string): Promise<boolean> => {
-    // Mock login - in production, this would call an API
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (phone && password) {
@@ -31,29 +33,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const adminUser = mockUsers.find(u => u.role === "admin");
         if (adminUser) {
           setUser(adminUser);
+          setCurrentUserId(adminUser.id);
           return true;
         }
       }
-      // Regular user login - use current user
-      setUser(currentUser);
+      // Find user by phone in the db store
+      const dbUsers = useDbStore.getState().users;
+      const found = dbUsers.find(u => u.phone === phone && u.role !== "admin");
+      if (found) {
+        setUser(found);
+        setCurrentUserId(found.id);
+        return true;
+      }
+      // Fallback to first mock user for demo
+      const fallback = dbUsers.find(u => u.role !== "admin") || mockUsers[0];
+      setUser(fallback);
+      setCurrentUserId(fallback.id);
       return true;
     }
     return false;
   };
 
   const register = async (data: RegisterData): Promise<boolean> => {
-    // Mock registration
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (data.phone && data.password && data.name) {
-      const newUser: User = {
-        id: `user-${Date.now()}`,
+      const newUser = addUser({
         name: data.name,
         phone: data.phone,
         memberSince: new Date().toISOString().split("T")[0],
         isVerified: false,
-      };
+        role: "user",
+      });
       setUser(newUser);
+      setCurrentUserId(newUser.id);
       return true;
     }
     return false;
@@ -61,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    setCurrentUserId(null);
   };
 
   return (
