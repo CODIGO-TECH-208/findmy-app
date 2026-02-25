@@ -58,7 +58,7 @@ export default function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="w-full text-center lg:text-left">
               <Badge variant="secondary" className="mb-6 py-1.5 px-4"><Sparkles className="h-3.5 w-3.5 mr-1.5" />University of Ghana Campus</Badge>
-              <h1 className="text-4xl md:text-5xl lg:text-7xl font-display font-extrabold text-foreground mb-6 leading-[1.1]">
+              <h1 className="text-4xl md:text-6xl lg:text-8xl font-extrabold font-col-sans text-foreground mb-6 leading-[1.1]">
                 Lost something? <span className="text-primary">We'll help you</span> find it.
               </h1>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
@@ -69,11 +69,11 @@ export default function Landing() {
                 <Button size="lg" variant="outline" onClick={() => navigate("/browse")} className="h-12 px-6 rounded-full">Browse Items</Button>
               </div>
               <div className="flex items-center justify-center lg:justify-normal gap-6 mt-10 pt-8 border-t border-border/50 ">
-                <div><p className="text-2xl font-bold text-foreground">{stats.itemsRecovered.toLocaleString()}</p><p className="text-xs text-muted-foreground">Items Recovered</p></div>
+                <div><p className="text-3xl font-bold text-foreground">{stats.itemsRecovered.toLocaleString()}</p><p className="text-xs text-muted-foreground">Items Recovered</p></div>
                 <div className="w-px h-10 bg-border" />
-                <div><p className="text-2xl font-bold text-foreground">{stats.registeredUsers.toLocaleString()}</p><p className="text-xs text-muted-foreground">Students</p></div>
+                <div><p className="text-3xl font-bold text-foreground">{stats.registeredUsers.toLocaleString()}</p><p className="text-xs text-muted-foreground">Students</p></div>
                 <div className="w-px h-10 bg-border" />
-                <div><p className="text-2xl font-bold text-primary">{stats.successRate}%</p><p className="text-xs text-muted-foreground">Success Rate</p></div>
+                <div><p className="text-3xl font-bold text-primary">{stats.successRate}%</p><p className="text-xs text-muted-foreground">Success Rate</p></div>
               </div>
             </div>
             <div className="hidden h-full lg:flex items-center justify-center relative">
