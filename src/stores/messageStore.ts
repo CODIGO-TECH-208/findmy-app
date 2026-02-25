@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { Message, Conversation } from "@/data/mockData";
-import { createMessage } from "@/lib/api";
 
 export interface MessageStoreState {
     // State
@@ -202,13 +201,6 @@ export const useMessageStore = create<MessageStoreState>()(
                         setTimeout(() => {
                             get().updateMessage(newMessage.id, { status: "read" });
                         }, 1500);
-
-                        // Persist to backend
-                        try {
-                            await createMessage(newMessage);
-                        } catch (e) {
-                            // ignore persistence errors for now
-                        }
 
                         // Update conversation's last message
                         const conversation = get().conversations.find((c) => c.id === conversationId);
