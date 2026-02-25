@@ -54,38 +54,34 @@ export default function Landing() {
           <img src={heroBg} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-background/85 dark:bg-background/90" />
         </div>
-        <div className="container mx-auto px-4 py-20 md:py-28 relative z-10">
+        <div className="container mx-auto px-4 md:px-8 py-20 md:py-28 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="max-w-xl">
+            <div className="w-full text-center lg:text-left">
               <Badge variant="secondary" className="mb-6 py-1.5 px-4"><Sparkles className="h-3.5 w-3.5 mr-1.5" />University of Ghana Campus</Badge>
-              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-display font-bold text-foreground mb-6 leading-[1.1]">
+              <h1 className="text-4xl md:text-6xl lg:text-8xl font-extrabold font-col-sans text-foreground mb-6 leading-[1.1]">
                 Lost something? <span className="text-primary">We'll help you</span> find it.
               </h1>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 The easiest way for UG students to report lost items and find their belongings. Join thousands of students helping each other.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col justify-center lg:justify-normal sm:flex-row gap-3">
                 <Button size="lg" onClick={() => navigate("/register")} className="gap-2 h-12 px-6 rounded-full">Get Started<ArrowRight className="h-4 w-4" /></Button>
                 <Button size="lg" variant="outline" onClick={() => navigate("/browse")} className="h-12 px-6 rounded-full">Browse Items</Button>
               </div>
-              <div className="flex items-center gap-6 mt-10 pt-8 border-t border-border/50">
-                <div><p className="text-2xl font-bold text-foreground">{stats.itemsRecovered.toLocaleString()}</p><p className="text-xs text-muted-foreground">Items Recovered</p></div>
+              <div className="flex items-center justify-center lg:justify-normal gap-6 mt-10 pt-8 border-t border-border/50 ">
+                <div><p className="text-3xl font-bold text-foreground">{stats.itemsRecovered.toLocaleString()}</p><p className="text-xs text-muted-foreground">Items Recovered</p></div>
                 <div className="w-px h-10 bg-border" />
-                <div><p className="text-2xl font-bold text-foreground">{stats.registeredUsers.toLocaleString()}</p><p className="text-xs text-muted-foreground">Students</p></div>
+                <div><p className="text-3xl font-bold text-foreground">{stats.registeredUsers.toLocaleString()}</p><p className="text-xs text-muted-foreground">Students</p></div>
                 <div className="w-px h-10 bg-border" />
-                <div><p className="text-2xl font-bold text-primary">{stats.successRate}%</p><p className="text-xs text-muted-foreground">Success Rate</p></div>
+                <div><p className="text-3xl font-bold text-primary">{stats.successRate}%</p><p className="text-xs text-muted-foreground">Success Rate</p></div>
               </div>
             </div>
-            <div className="hidden lg:flex items-center justify-center relative">
-              <div className="relative">
+            <div className="hidden h-full lg:flex items-center justify-center relative">
+              <div className="relative bg-white rounded-2xl h-full w-full">
                 <div className="absolute -inset-8 rounded-full bg-primary/5 blur-3xl" />
                 <div className="relative bg-card/80 backdrop-blur rounded-3xl p-8 shadow-card border border-border/50">
-                  <img src={logo} alt="FindMy" className="size-40 object-contain dark:hidden" />
-                  <img src={logo_dark} alt="FindMy" className="size-40 object-contain hidden dark:block" />
-                  <div className="mt-4 text-center">
-                    <p className="font-display font-bold text-xl text-foreground">FindMy</p>
-                    <p className="text-sm text-muted-foreground">Campus Lost & Found</p>
-                  </div>
+                  <img src={logo} alt="FindMy" className="w-full object-contain dark:hidden" />
+                  <img src={logo_dark} alt="FindMy" className="w-full object-contain hidden dark:block" />
                 </div>
                 <div className="absolute -top-4 -right-8 bg-success text-success-foreground rounded-full px-3 py-1.5 text-xs font-medium shadow-lg animate-bounce">{stats.activeListings} Active</div>
                 <div className="absolute -bottom-4 -left-6 bg-card border rounded-full px-3 py-1.5 text-xs font-medium shadow-lg flex items-center gap-1.5"><Users className="h-3 w-3 text-primary" />{stats.registeredUsers.toLocaleString()} users</div>
