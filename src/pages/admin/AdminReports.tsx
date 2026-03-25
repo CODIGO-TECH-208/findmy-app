@@ -1,395 +1,191 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockUsers, mockItems, mockClaims, CATEGORIES } from "@/data/mockData";
-import { BarChart3, TrendingUp, Users, Package } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { useDatabaseStore } from "@/stores/databaseStore";
+import { CATEGORIES } from "@/data/mockData";
+import { BarChart3, TrendingUp, Users, Package, PieChart, ArrowUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const AdminReports = () => {
-    const [analytics, setAnalytics] = useState({
-        itemsByCategory: [] as { category: string; count: number; label: string }[],
-        itemsByType: { lost: 0, found: 0 },
-        itemsByStatus: { active: 0, claimed: 0, resolved: 0 },
-        claimsByStatus: { pending: 0, accepted: 0, rejected: 0 },
-        userGrowth: [] as { month: string; count: number }[],
-    });
+  const items = useDatabaseStore((s) => s.items);
+  const users = useDatabaseStore((s) => s.users);
+  const claims = useDatabaseStore((s) => s.claims);
 
-    useEffect(() => {
-        // Items by category
-        const categoryCounts = CATEGORIES.map((cat) => ({
-            category: cat.value,
-            label: cat.label,
-            count: mockItems.filter((item) => item.category === cat.value).length,
-        })).filter((cat) => cat.count > 0);
+  const analytics = useMemo(() => {
+    const categoryCounts = CATEGORIES.map((cat) => ({
+      category: cat.value,
+      label: cat.label,
+      icon: cat.icon,
+      count: items.filter((i) => i.category === cat.value).length,
+    })).filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
 
-        // Items by type
-        const itemsByType = {
-            lost: mockItems.filter((item) => item.type === "lost").length,
-            found: mockItems.filter((item) => item.type === "found").length,
-        };
+    const lost = items.filter((i) => i.type === "lost").length;
+    const found = items.filter((i) => i.type === "found").length;
+    const active = items.filter((i) => i.status === "active").length;
+    const claimed = items.filter((i) => i.status === "claimed").length;
+    const resolved = items.filter((i) => i.status === "resolved").length;
+    const pending = claims.filter((c) => c.status === "pending").length;
+    const accepted = claims.filter((c) => c.status === "accepted").length;
+    const rejected = claims.filter((c) => c.status === "rejected").length;
+    const totalUsers = users.filter((u) => u.role !== "admin").length;
+    const verified = users.filter((u) => u.isVerified && u.role !== "admin").length;
 
-        // Items by status
-        const itemsByStatus = {
-            active: mockItems.filter((item) => item.status === "active").length,
-            claimed: mockItems.filter((item) => item.status === "claimed").length,
-            resolved: mockItems.filter((item) => item.status === "resolved").length,
-        };
+    return { categoryCounts, lost, found, active, claimed, resolved, pending, accepted, rejected, totalUsers, verified };
+  }, [items, users, claims]);
 
-        // Claims by status
-        const claimsByStatus = {
-            pending: mockClaims.filter((claim) => claim.status === "pending").length,
-            accepted: mockClaims.filter((claim) => claim.status === "accepted").length,
-            rejected: mockClaims.filter((claim) => claim.status === "rejected").length,
-        };
+  const total = items.length;
+  const totalClaims = claims.length;
 
-        // User growth (mock data by month)
-        const userGrowth = [
-            { month: "Jan", count: 5 },
-            { month: "Feb", count: 12 },
-            { month: "Mar", count: 18 },
-            { month: "Apr", count: 25 },
-            { month: "May", count: 32 },
-            { month: "Jun", count: mockUsers.filter(u => u.role !== "admin").length },
-        ];
+  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
 
-        setAnalytics({
-            itemsByCategory: categoryCounts,
-            itemsByType,
-            itemsByStatus,
-            claimsByStatus,
-            userGrowth,
-        });
-    }, []);
+  const StatBar = ({ label, value, total, color }: { label: string; value: number; total: number; color: string }) => (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-medium text-foreground">{value} <span className="text-muted-foreground font-normal">({pct(value, total)}%)</span></span>
+      </div>
+      <div className="h-2 rounded-full bg-muted overflow-hidden">
+        <div className={cn("h-full rounded-full transition-all duration-500", color)} style={{ width: `${pct(value, total)}%` }} />
+      </div>
+    </div>
+  );
 
-    return (
-        <AdminLayout>
-            <div className="space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-                    <p className="text-muted-foreground">
-                        Platform statistics and insights
-                    </p>
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Analytics</h2>
+          <p className="text-sm text-muted-foreground">Platform statistics and performance insights</p>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Total Items", value: total, icon: Package, sub: `${analytics.active} active`, color: "text-primary" },
+            { label: "Users", value: analytics.totalUsers, icon: Users, sub: `${analytics.verified} verified`, color: "text-emerald-500" },
+            { label: "Resolution Rate", value: `${pct(analytics.resolved, total)}%`, icon: TrendingUp, sub: `${analytics.resolved} resolved`, color: "text-violet-500" },
+            { label: "Claims", value: totalClaims, icon: BarChart3, sub: `${analytics.pending} pending`, color: "text-amber-500" },
+          ].map((s) => {
+            const Icon = s.icon;
+            return (
+              <div key={s.label} className="rounded-xl border border-border bg-card p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg bg-muted", s.color)}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">{s.label}</span>
                 </div>
+                <p className="text-2xl font-bold text-foreground">{s.value}</p>
+                <p className="text-xs text-muted-foreground mt-1">{s.sub}</p>
+              </div>
+            );
+          })}
+        </div>
 
-                {/* Overview Stats */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-                            <Package className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{mockItems.length}</div>
-                            <p className="text-xs text-muted-foreground">
-                                {analytics.itemsByType.lost} lost, {analytics.itemsByType.found} found
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {mockUsers.filter(u => u.role !== "admin").length}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                {mockUsers.filter(u => u.isVerified && u.role !== "admin").length} verified
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Resolution Rate</CardTitle>
-                            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {mockItems.length > 0
-                                    ? Math.round((analytics.itemsByStatus.resolved / mockItems.length) * 100)
-                                    : 0}
-                                %
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                {analytics.itemsByStatus.resolved} items resolved
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Pending Claims</CardTitle>
-                            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {analytics.claimsByStatus.pending}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                Awaiting review
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Charts Section */}
-                <div className="grid gap-4 md:grid-cols-2">
-                    {/* Items by Category */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Items by Category</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {analytics.itemsByCategory.map((cat) => {
-                                    const maxCount = Math.max(...analytics.itemsByCategory.map(c => c.count));
-                                    const percentage = (cat.count / maxCount) * 100;
-                                    return (
-                                        <div key={cat.category}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-sm font-medium">{cat.label}</span>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {cat.count}
-                                                </span>
-                                            </div>
-                                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-blue-600"
-                                                    style={{ width: `${percentage}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Items by Status */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Items by Status</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Active</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.itemsByStatus.active}
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-green-600"
-                                            style={{
-                                                width: `${mockItems.length > 0
-                                                        ? (analytics.itemsByStatus.active / mockItems.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Claimed</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.itemsByStatus.claimed}
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-yellow-600"
-                                            style={{
-                                                width: `${mockItems.length > 0
-                                                        ? (analytics.itemsByStatus.claimed / mockItems.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Resolved</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.itemsByStatus.resolved}
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-purple-600"
-                                            style={{
-                                                width: `${mockItems.length > 0
-                                                        ? (analytics.itemsByStatus.resolved / mockItems.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Lost vs Found */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Lost vs Found Items</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Lost Items</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.itemsByType.lost} (
-                                            {mockItems.length > 0
-                                                ? Math.round((analytics.itemsByType.lost / mockItems.length) * 100)
-                                                : 0}
-                                            %)
-                                        </span>
-                                    </div>
-                                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-red-500"
-                                            style={{
-                                                width: `${mockItems.length > 0
-                                                        ? (analytics.itemsByType.lost / mockItems.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Found Items</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.itemsByType.found} (
-                                            {mockItems.length > 0
-                                                ? Math.round((analytics.itemsByType.found / mockItems.length) * 100)
-                                                : 0}
-                                            %)
-                                        </span>
-                                    </div>
-                                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-green-500"
-                                            style={{
-                                                width: `${mockItems.length > 0
-                                                        ? (analytics.itemsByType.found / mockItems.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Claims Statistics */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Claims Statistics</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Pending</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.claimsByStatus.pending}
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-yellow-600"
-                                            style={{
-                                                width: `${mockClaims.length > 0
-                                                        ? (analytics.claimsByStatus.pending / mockClaims.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Accepted</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.claimsByStatus.accepted}
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-green-600"
-                                            style={{
-                                                width: `${mockClaims.length > 0
-                                                        ? (analytics.claimsByStatus.accepted / mockClaims.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium">Rejected</span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {analytics.claimsByStatus.rejected}
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-red-600"
-                                            style={{
-                                                width: `${mockClaims.length > 0
-                                                        ? (analytics.claimsByStatus.rejected / mockClaims.length) * 100
-                                                        : 0
-                                                    }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* User Growth Chart */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>User Growth Trend</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex items-end justify-between h-48 gap-4">
-                            {analytics.userGrowth.map((data, index) => {
-                                const maxCount = Math.max(...analytics.userGrowth.map(d => d.count));
-                                const height = (data.count / maxCount) * 100;
-                                return (
-                                    <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                                        <div className="relative w-full">
-                                            <div
-                                                className="w-full bg-blue-600 rounded-t transition-all"
-                                                style={{ height: `${height * 1.5}px` }}
-                                            >
-                                                <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-medium">
-                                                    {data.count}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <span className="text-sm text-muted-foreground">{data.month}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </CardContent>
-                </Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Items by Category */}
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <PieChart className="h-5 w-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Items by Category</h3>
             </div>
-        </AdminLayout>
-    );
+            <div className="space-y-4">
+              {analytics.categoryCounts.map((cat) => {
+                const maxCount = analytics.categoryCounts[0]?.count || 1;
+                return (
+                  <div key={cat.category} className="flex items-center gap-3">
+                    <span className="text-lg w-7 text-center">{cat.icon}</span>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-foreground">{cat.label}</span>
+                        <span className="text-muted-foreground">{cat.count}</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(cat.count / maxCount) * 100}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Lost vs Found */}
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Item Breakdown</h3>
+            </div>
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm font-medium text-foreground mb-3">Type Distribution</p>
+                <div className="space-y-3">
+                  <StatBar label="Lost" value={analytics.lost} total={total} color="bg-destructive" />
+                  <StatBar label="Found" value={analytics.found} total={total} color="bg-emerald-500" />
+                </div>
+              </div>
+              <div className="border-t border-border pt-5">
+                <p className="text-sm font-medium text-foreground mb-3">Status Distribution</p>
+                <div className="space-y-3">
+                  <StatBar label="Active" value={analytics.active} total={total} color="bg-primary" />
+                  <StatBar label="Claimed" value={analytics.claimed} total={total} color="bg-amber-500" />
+                  <StatBar label="Resolved" value={analytics.resolved} total={total} color="bg-violet-500" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Claims Stats */}
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Claims Overview</h3>
+            </div>
+            <div className="space-y-3">
+              <StatBar label="Pending" value={analytics.pending} total={totalClaims} color="bg-amber-500" />
+              <StatBar label="Accepted" value={analytics.accepted} total={totalClaims} color="bg-emerald-500" />
+              <StatBar label="Rejected" value={analytics.rejected} total={totalClaims} color="bg-destructive" />
+            </div>
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              {[
+                { label: "Pending", value: analytics.pending, color: "bg-amber-500/10 text-amber-600" },
+                { label: "Accepted", value: analytics.accepted, color: "bg-emerald-500/10 text-emerald-600" },
+                { label: "Rejected", value: analytics.rejected, color: "bg-destructive/10 text-destructive" },
+              ].map((s) => (
+                <div key={s.label} className={cn("rounded-lg p-3 text-center", s.color)}>
+                  <p className="text-xl font-bold">{s.value}</p>
+                  <p className="text-xs mt-0.5">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* User Stats */}
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Users className="h-5 w-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">User Insights</h3>
+            </div>
+            <div className="space-y-3">
+              <StatBar label="Verified" value={analytics.verified} total={analytics.totalUsers} color="bg-emerald-500" />
+              <StatBar label="Unverified" value={analytics.totalUsers - analytics.verified} total={analytics.totalUsers} color="bg-muted-foreground" />
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="rounded-lg bg-muted/50 p-4 text-center">
+                <p className="text-2xl font-bold text-foreground">{analytics.totalUsers}</p>
+                <p className="text-xs text-muted-foreground mt-1">Total Users</p>
+              </div>
+              <div className="rounded-lg bg-emerald-500/10 p-4 text-center">
+                <p className="text-2xl font-bold text-emerald-600">{pct(analytics.verified, analytics.totalUsers)}%</p>
+                <p className="text-xs text-emerald-600/70 mt-1">Verification Rate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AdminLayout>
+  );
 };
 
 export default AdminReports;
