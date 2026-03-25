@@ -1,11 +1,16 @@
 import { useMemo } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { useDatabaseStore } from "@/stores/databaseStore";
 import { CATEGORIES } from "@/data/mockData";
-import { BarChart3, TrendingUp, Users, Package, PieChart, ArrowUp } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Package, PieChart, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  Cell, PieChart as RePieChart, Pie, Legend, AreaChart, Area 
+} from 'recharts';
+
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a4de6c'];
 
 const AdminReports = () => {
   const items = useDatabaseStore((s) => s.items);
@@ -14,172 +19,185 @@ const AdminReports = () => {
 
   const analytics = useMemo(() => {
     const categoryCounts = CATEGORIES.map((cat) => ({
-      category: cat.value,
-      label: cat.label,
-      icon: cat.icon,
+      name: cat.label,
       count: items.filter((i) => i.category === cat.value).length,
     })).filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
 
-    const lost = items.filter((i) => i.type === "lost").length;
-    const found = items.filter((i) => i.type === "found").length;
-    const active = items.filter((i) => i.status === "active").length;
-    const claimed = items.filter((i) => i.status === "claimed").length;
+    const typeData = [
+      { name: 'Lost', value: items.filter((i) => i.type === "lost").length },
+      { name: 'Found', value: items.filter((i) => i.type === "found").length }
+    ];
+
+    const statusData = [
+      { name: 'Active', value: items.filter((i) => i.status === "active").length },
+      { name: 'Claimed', value: items.filter((i) => i.status === "claimed").length },
+      { name: 'Resolved', value: items.filter((i) => i.status === "resolved").length }
+    ];
+
+    const claimsData = [
+      { name: 'Pending', value: claims.filter((c) => c.status === "pending").length },
+      { name: 'Accepted', value: claims.filter((c) => c.status === "accepted").length },
+      { name: 'Rejected', value: claims.filter((c) => c.status === "rejected").length }
+    ];
+
+    const total = items.length;
     const resolved = items.filter((i) => i.status === "resolved").length;
-    const pending = claims.filter((c) => c.status === "pending").length;
-    const accepted = claims.filter((c) => c.status === "accepted").length;
-    const rejected = claims.filter((c) => c.status === "rejected").length;
     const totalUsers = users.filter((u) => u.role !== "admin").length;
     const verified = users.filter((u) => u.isVerified && u.role !== "admin").length;
 
-    return { categoryCounts, lost, found, active, claimed, resolved, pending, accepted, rejected, totalUsers, verified };
+    return { categoryCounts, typeData, statusData, claimsData, total, resolved, totalUsers, verified };
   }, [items, users, claims]);
 
-  const total = items.length;
-  const totalClaims = claims.length;
-
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
-
-  const StatBar = ({ label, value, total, color }: { label: string; value: number; total: number; color: string }) => (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium text-foreground">{value} <span className="text-muted-foreground font-normal">({pct(value, total)}%)</span></span>
-      </div>
-      <div className="h-2 rounded-full bg-muted overflow-hidden">
-        <div className={cn("h-full rounded-full transition-all duration-500", color)} style={{ width: `${pct(value, total)}%` }} />
-      </div>
-    </div>
-  );
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Analytics</h2>
-          <p className="text-sm text-muted-foreground">Platform statistics and performance insights</p>
+          <h2 className="text-2xl font-bold text-foreground">Analytics & Performance</h2>
+          <p className="text-sm text-muted-foreground">Detailed insights into your campus lost and found platform.</p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total Items", value: total, icon: Package, sub: `${analytics.active} active`, color: "text-primary" },
-            { label: "Users", value: analytics.totalUsers, icon: Users, sub: `${analytics.verified} verified`, color: "text-emerald-500" },
-            { label: "Resolution Rate", value: `${pct(analytics.resolved, total)}%`, icon: TrendingUp, sub: `${analytics.resolved} resolved`, color: "text-violet-500" },
-            { label: "Claims", value: totalClaims, icon: BarChart3, sub: `${analytics.pending} pending`, color: "text-amber-500" },
+            { label: "Items Listed", value: analytics.total, icon: Package, sub: `${analytics.statusData[0].value} currently active`, color: "text-primary" },
+            { label: "User Base", value: analytics.totalUsers, icon: Users, sub: `${analytics.verified} verified accounts`, color: "text-emerald-500" },
+            { label: "Success Rate", value: `${pct(analytics.resolved, analytics.total)}%`, icon: TrendingUp, sub: "Items successfully reunited", color: "text-violet-500" },
+            { label: "Active Claims", value: claims.length, icon: Activity, sub: `${analytics.claimsData[0].value} pending review`, color: "text-amber-500" },
           ].map((s) => {
             const Icon = s.icon;
             return (
-              <div key={s.label} className="rounded-xl border border-border bg-card p-5">
+              <div key={s.label} className="rounded-xl border border-border bg-card p-5 group hover:shadow-lg transition-all">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg bg-muted", s.color)}>
-                    <Icon className="h-4 w-4" />
+                  <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg bg-muted group-hover:bg-primary/10 transition-colors", s.color)}>
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <span className="text-sm text-muted-foreground">{s.label}</span>
+                  <span className="text-sm font-medium text-muted-foreground">{s.label}</span>
                 </div>
-                <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground mt-1">{s.sub}</p>
+                <p className="text-3xl font-extrabold text-foreground">{s.value}</p>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" /> {s.sub}
+                </p>
               </div>
             );
           })}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Items by Category */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <PieChart className="h-5 w-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Items by Category</h3>
+          {/* Category Distribution Chart */}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-8">
+              <div className="p-2 bg-primary/10 rounded-lg"><BarChart3 className="h-4 w-4 text-primary" /></div>
+              <h3 className="text-base font-bold text-foreground">Items by Category</h3>
             </div>
-            <div className="space-y-4">
-              {analytics.categoryCounts.map((cat) => {
-                const maxCount = analytics.categoryCounts[0]?.count || 1;
-                return (
-                  <div key={cat.category} className="flex items-center gap-3">
-                    <span className="text-lg w-7 text-center">{cat.icon}</span>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-foreground">{cat.label}</span>
-                        <span className="text-muted-foreground">{cat.count}</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(cat.count / maxCount) * 100}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.categoryCounts} layout="vertical" margin={{ left: 30, right: 30 }}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} style={{ fontSize: '12px' }} />
+                  <Tooltip 
+                    cursor={{ fill: 'transparent' }} 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
+                  />
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
+                    {analytics.categoryCounts.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Lost vs Found */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Item Breakdown</h3>
+          {/* Lost vs Found Pie Chart */}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-8">
+              <div className="p-2 bg-violet-500/10 rounded-lg"><PieChart className="h-3 w-3 text-violet-600" /></div>
+              <h3 className="text-base font-bold text-foreground">Lost vs Found Ratio</h3>
             </div>
-            <div className="space-y-6">
-              <div>
-                <p className="text-sm font-medium text-foreground mb-3">Type Distribution</p>
-                <div className="space-y-3">
-                  <StatBar label="Lost" value={analytics.lost} total={total} color="bg-destructive" />
-                  <StatBar label="Found" value={analytics.found} total={total} color="bg-emerald-500" />
-                </div>
-              </div>
-              <div className="border-t border-border pt-5">
-                <p className="text-sm font-medium text-foreground mb-3">Status Distribution</p>
-                <div className="space-y-3">
-                  <StatBar label="Active" value={analytics.active} total={total} color="bg-primary" />
-                  <StatBar label="Claimed" value={analytics.claimed} total={total} color="bg-amber-500" />
-                  <StatBar label="Resolved" value={analytics.resolved} total={total} color="bg-violet-500" />
-                </div>
-              </div>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <RePieChart>
+                  <Pie
+                    data={analytics.typeData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={8}
+                    dataKey="value"
+                  >
+                    {analytics.typeData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? '#ef4444' : '#10b981'} strokeWidth={0} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend iconType="circle" />
+                </RePieChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Claims Stats */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Claims Overview</h3>
+          {/* Status Breakdown */}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-8">
+              <div className="p-2 bg-emerald-500/10 rounded-lg"><TrendingUp className="h-4 w-4 text-emerald-600" /></div>
+              <h3 className="text-base font-bold text-foreground">Status Distribution</h3>
             </div>
-            <div className="space-y-3">
-              <StatBar label="Pending" value={analytics.pending} total={totalClaims} color="bg-amber-500" />
-              <StatBar label="Accepted" value={analytics.accepted} total={totalClaims} color="bg-emerald-500" />
-              <StatBar label="Rejected" value={analytics.rejected} total={totalClaims} color="bg-destructive" />
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={analytics.statusData} margin={{ left: -20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} style={{ fontSize: '11px', fontWeight: 500 }} />
+                  <YAxis axisLine={false} tickLine={false} style={{ fontSize: '11px' }} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="#8884d8" fillOpacity={1} fill="url(#colorVal)" />
+                  <defs>
+                    <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              {[
-                { label: "Pending", value: analytics.pending, color: "bg-amber-500/10 text-amber-600" },
-                { label: "Accepted", value: analytics.accepted, color: "bg-emerald-500/10 text-emerald-600" },
-                { label: "Rejected", value: analytics.rejected, color: "bg-destructive/10 text-destructive" },
-              ].map((s) => (
-                <div key={s.label} className={cn("rounded-lg p-3 text-center", s.color)}>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-xs mt-0.5">{s.label}</p>
+          </div>
+
+           {/* Claims Health */}
+           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-8">
+              <div className="p-2 bg-amber-500/10 rounded-lg"><Activity className="h-4 w-4 text-amber-600" /></div>
+              <h3 className="text-base font-bold text-foreground">Claims Review Cycle</h3>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              {analytics.claimsData.map((s, i) => (
+                <div key={i} className="text-center p-4 rounded-2xl bg-muted/30 border border-border/50">
+                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-tight">{s.name}</p>
+                  <p className="text-2xl font-black mt-1">{s.value}</p>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* User Stats */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <Users className="h-5 w-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">User Insights</h3>
-            </div>
-            <div className="space-y-3">
-              <StatBar label="Verified" value={analytics.verified} total={analytics.totalUsers} color="bg-emerald-500" />
-              <StatBar label="Unverified" value={analytics.totalUsers - analytics.verified} total={analytics.totalUsers} color="bg-muted-foreground" />
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-muted/50 p-4 text-center">
-                <p className="text-2xl font-bold text-foreground">{analytics.totalUsers}</p>
-                <p className="text-xs text-muted-foreground mt-1">Total Users</p>
-              </div>
-              <div className="rounded-lg bg-emerald-500/10 p-4 text-center">
-                <p className="text-2xl font-bold text-emerald-600">{pct(analytics.verified, analytics.totalUsers)}%</p>
-                <p className="text-xs text-emerald-600/70 mt-1">Verification Rate</p>
-              </div>
+            <div className="space-y-4">
+               <div>
+                  <div className="flex justify-between text-xs font-bold mb-2">
+                    <span className="uppercase text-muted-foreground">Verification Accuracy</span>
+                    <span className="text-primary">{pct(analytics.verified, analytics.totalUsers)}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all duration-1000" 
+                      style={{ width: `${pct(analytics.verified, analytics.totalUsers)}%` }} 
+                    />
+                  </div>
+               </div>
+               <p className="text-xs text-muted-foreground italic leading-relaxed pt-2">
+                 Maintaining a high verification rate ensures the platform remains safe for all Legon students.
+               </p>
             </div>
           </div>
         </div>
