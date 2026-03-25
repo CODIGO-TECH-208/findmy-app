@@ -1,131 +1,182 @@
 import AdminLayout from "@/components/layout/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDatabaseStore } from "@/stores/databaseStore";
-import { Users, Package, FileText, CheckCircle, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Users, Package, FileText, CheckCircle, TrendingUp, TrendingDown, ArrowUpRight, Clock, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 
 const AdminDashboard = () => {
   const users = useDatabaseStore((s) => s.users);
   const items = useDatabaseStore((s) => s.items);
   const claims = useDatabaseStore((s) => s.claims);
 
-  const totalUsers = users.filter(u => u.role !== "admin").length;
+  const totalUsers = users.filter((u) => u.role !== "admin").length;
   const totalItems = items.length;
   const totalClaims = claims.length;
-  const resolvedItems = items.filter(item => item.status === "resolved").length;
-  const activeItems = items.filter(item => item.status === "active").length;
-  const pendingClaims = claims.filter(claim => claim.status === "pending").length;
+  const resolvedItems = items.filter((i) => i.status === "resolved").length;
+  const activeItems = items.filter((i) => i.status === "active").length;
+  const pendingClaims = claims.filter((c) => c.status === "pending").length;
+  const resolutionRate = totalItems > 0 ? Math.round((resolvedItems / totalItems) * 100) : 0;
 
-  const statCards = [
-    { title: "Total Users", value: totalUsers, description: "Registered users", icon: Users, bgColor: "bg-gradient-to-br from-blue-50 to-blue-100", iconColor: "text-blue-600", trend: "+12%", trendUp: true },
-    { title: "Total Items", value: totalItems, description: `${activeItems} active items`, icon: Package, bgColor: "bg-gradient-to-br from-green-50 to-green-100", iconColor: "text-green-600", trend: "+8%", trendUp: true },
-    { title: "Total Claims", value: totalClaims, description: `${pendingClaims} pending review`, icon: FileText, bgColor: "bg-gradient-to-br from-yellow-50 to-yellow-100", iconColor: "text-yellow-600", trend: "+5%", trendUp: true },
-    { title: "Resolved Items", value: resolvedItems, description: "Successfully matched", icon: CheckCircle, bgColor: "bg-gradient-to-br from-purple-50 to-purple-100", iconColor: "text-purple-600", trend: "+15%", trendUp: true },
+  const stats = [
+    { label: "Total Users", value: totalUsers, icon: Users, change: "+12%", up: true, color: "text-primary" },
+    { label: "Total Items", value: totalItems, icon: Package, change: "+8%", up: true, color: "text-emerald-500" },
+    { label: "Pending Claims", value: pendingClaims, icon: Clock, change: `${totalClaims} total`, up: false, color: "text-amber-500" },
+    { label: "Resolved", value: resolvedItems, icon: CheckCircle, change: `${resolutionRate}%`, up: true, color: "text-violet-500" },
   ];
 
-  const recentItems = items.slice(0, 5);
+  const recentItems = items.slice(0, 6);
   const recentClaims = claims.slice(0, 5);
 
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <div className="rounded-xl bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 p-8 text-white shadow-lg">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-4xl font-bold">Super Admin Dashboard</h1>
-              <p className="text-blue-100 mt-2 text-lg">Complete platform control and management</p>
-            </div>
-            <div className="text-right">
-              <div className="inline-flex items-center gap-2 rounded-lg bg-blue-600/30 px-4 py-2 backdrop-blur">
-                <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse"></div>
-                <span className="text-sm font-semibold">System Online</span>
-              </div>
-            </div>
-          </div>
+        {/* Welcome */}
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Welcome back 👋</h2>
+          <p className="text-muted-foreground mt-1">Here's what's happening on your platform today.</p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <h2 className="text-3xl font-bold text-slate-900">Platform Overview</h2>
-          <p className="text-slate-600">Real-time metrics and key performance indicators</p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((stat) => {
+        {/* Stat Cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.title} className={cn("rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100", stat.bgColor)}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className={cn("rounded-lg p-3", stat.bgColor)}><Icon className={cn("h-6 w-6", stat.iconColor)} /></div>
-                  <div className={cn("flex items-center gap-1 text-sm font-semibold", stat.trendUp ? "text-green-600" : "text-red-600")}>
-                    {stat.trendUp ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}{stat.trend}
+              <div
+                key={stat.label}
+                className="group rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md"
+              >
+                <div className="flex items-center justify-between">
+                  <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg bg-muted", stat.color)}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className={cn("flex items-center gap-1 text-xs font-medium", stat.up ? "text-emerald-500" : "text-muted-foreground")}>
+                    {stat.up && <TrendingUp className="h-3 w-3" />}
+                    {stat.change}
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-slate-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
-                  <p className="text-xs text-slate-500 pt-2">{stat.description}</p>
+                <div className="mt-4">
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{stat.label}</p>
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-md">
-            <h3 className="text-lg font-bold text-slate-900 mb-6">Recent Items</h3>
-            <div className="space-y-4">
+        {/* Platform Health */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <Activity className="h-5 w-5 text-primary" />
+            <h3 className="text-base font-semibold text-foreground">Platform Health</h3>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Resolution Rate</span>
+                <span className="font-semibold text-foreground">{resolutionRate}%</span>
+              </div>
+              <Progress value={resolutionRate} className="h-2" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Active Items</span>
+                <span className="font-semibold text-foreground">{totalItems > 0 ? Math.round((activeItems / totalItems) * 100) : 0}%</span>
+              </div>
+              <Progress value={totalItems > 0 ? (activeItems / totalItems) * 100 : 0} className="h-2" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Claims Processed</span>
+                <span className="font-semibold text-foreground">{totalClaims > 0 ? Math.round(((totalClaims - pendingClaims) / totalClaims) * 100) : 0}%</span>
+              </div>
+              <Progress value={totalClaims > 0 ? ((totalClaims - pendingClaims) / totalClaims) * 100 : 0} className="h-2" />
+            </div>
+          </div>
+        </div>
+
+        {/* Two Column: Recent Items + Claims */}
+        <div className="grid gap-6 lg:grid-cols-5">
+          {/* Recent Items - wider */}
+          <div className="lg:col-span-3 rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between p-5 pb-0">
+              <h3 className="text-base font-semibold text-foreground">Recent Items</h3>
+              <Badge variant="secondary" className="text-xs">{activeItems} active</Badge>
+            </div>
+            <div className="p-5 space-y-3">
               {recentItems.map((item) => (
-                <div key={item.id} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                  {item.images[0] && <img src={item.images[0]} alt={item.title} className="h-12 w-12 rounded-lg object-cover" />}
+                <div key={item.id} className="flex items-center gap-3 rounded-lg p-2.5 hover:bg-muted/50 transition-colors">
+                  {item.images[0] ? (
+                    <img src={item.images[0]} alt={item.title} className="h-10 w-10 rounded-lg object-cover" />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                      <Package className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-                    <p className="text-xs text-slate-500 mt-1">{item.type === "lost" ? "🔴 Lost" : "🟢 Found"} • {item.location}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.location} · {item.date}</p>
                   </div>
-                  <span className={cn("text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap", item.status === "active" ? "bg-green-100 text-green-700" : item.status === "claimed" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700")}>{item.status}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "text-[10px] px-2 py-0.5 border-0",
+                        item.type === "lost" ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-600"
+                      )}
+                    >
+                      {item.type}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "text-[10px] px-2 py-0.5 border-0",
+                        item.status === "active" ? "bg-primary/10 text-primary" :
+                        item.status === "claimed" ? "bg-amber-500/10 text-amber-600" :
+                        "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {item.status}
+                    </Badge>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <Card>
-            <CardHeader><CardTitle>Recent Claims</CardTitle></CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentClaims.map((claim) => (
-                  <div key={claim.id} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                    {claim.item.images[0] && <img src={claim.item.images[0]} alt={claim.item.title} className="h-12 w-12 rounded-lg object-cover" />}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900">{claim.item.title}</p>
-                      <p className="text-xs text-slate-500 mt-1">By {claim.user.name}</p>
-                    </div>
-                    <span className={cn("text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap", claim.status === "pending" ? "bg-yellow-100 text-yellow-700" : claim.status === "accepted" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}>{claim.status}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-md">
-          <div className="flex items-center gap-2 mb-6"><TrendingUp className="h-6 w-6 text-blue-600" /><h3 className="text-lg font-bold text-slate-900">Platform Health</h3></div>
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-slate-700">Resolution Rate</span>
-                <span className="text-sm font-bold text-green-600">{totalItems > 0 ? Math.round((resolvedItems / totalItems) * 100) : 0}%</span>
-              </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500" style={{ width: `${totalItems > 0 ? (resolvedItems / totalItems) * 100 : 0}%` }} />
-              </div>
+          {/* Recent Claims */}
+          <div className="lg:col-span-2 rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between p-5 pb-0">
+              <h3 className="text-base font-semibold text-foreground">Recent Claims</h3>
+              <Badge variant="secondary" className="text-xs">{pendingClaims} pending</Badge>
             </div>
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-slate-700">Active Items</span>
-                <span className="text-sm font-bold text-blue-600">{totalItems > 0 ? Math.round((activeItems / totalItems) * 100) : 0}%</span>
-              </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500" style={{ width: `${totalItems > 0 ? (activeItems / totalItems) * 100 : 0}%` }} />
-              </div>
+            <div className="p-5 space-y-3">
+              {recentClaims.map((claim) => (
+                <div key={claim.id} className="flex items-center gap-3 rounded-lg p-2.5 hover:bg-muted/50 transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={claim.user.avatar} alt={claim.user.name} />
+                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                      {claim.user.name.split(" ").map((n) => n[0]).join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{claim.item.title}</p>
+                    <p className="text-xs text-muted-foreground">by {claim.user.name}</p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-[10px] px-2 py-0.5 border-0 capitalize",
+                      claim.status === "pending" ? "bg-amber-500/10 text-amber-600" :
+                      claim.status === "accepted" ? "bg-emerald-500/10 text-emerald-600" :
+                      "bg-destructive/10 text-destructive"
+                    )}
+                  >
+                    {claim.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
           </div>
         </div>

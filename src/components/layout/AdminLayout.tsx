@@ -4,226 +4,202 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
-    LayoutDashboard,
-    Users,
-    Package,
-    FileText,
-    BarChart3,
-    LogOut,
-    Menu,
-    X,
-    ChevronRight,
-    Crown,
+  LayoutDashboard,
+  Users,
+  Package,
+  FileText,
+  BarChart3,
+  LogOut,
+  Menu,
+  X,
+  Bell,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { useDatabaseStore } from "@/stores/databaseStore";
 
 interface AdminLayoutProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
+const navItems = [
+  { href: "/admin/dashboard", icon: LayoutDashboard, label: "Overview" },
+  { href: "/admin/users", icon: Users, label: "Users" },
+  { href: "/admin/items", icon: Package, label: "Items" },
+  { href: "/admin/claims", icon: FileText, label: "Claims" },
+  { href: "/admin/reports", icon: BarChart3, label: "Analytics" },
+];
+
 const AdminLayout = ({ children }: AdminLayoutProps) => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { logout, isAdmin, user } = useAuth();
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const claims = useDatabaseStore((s) => s.claims);
+  const pendingClaims = claims.filter((c) => c.status === "pending").length;
 
-    // Redirect is now handled by AdminRoute wrapper
-    // This component only renders when user is already verified as admin
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
+  const currentPage = navItems.find((n) => location.pathname === n.href);
 
-    const navItems = [
-        {
-            href: "/admin/dashboard",
-            icon: LayoutDashboard,
-            label: "Dashboard",
-            badge: null,
-        },
-        {
-            href: "/admin/users",
-            icon: Users,
-            label: "Users",
-            badge: null,
-        },
-        {
-            href: "/admin/items",
-            icon: Package,
-            label: "Items",
-            badge: null,
-        },
-        {
-            href: "/admin/claims",
-            icon: FileText,
-            label: "Claims",
-            badge: "5",
-        },
-        {
-            href: "/admin/reports",
-            icon: BarChart3,
-            label: "Reports",
-            badge: null,
-        },
-    ];
-
-    const Sidebar = ({ mobile = false }) => (
-        <div className={cn(
-            "flex h-full flex-col",
-            "border-r bg-gradient-to-b from-slate-900 to-slate-800",
-            "text-white shadow-lg"
-        )}>
-            {/* Header */}
-            <div className="flex h-20 items-center justify-between border-b border-slate-700 px-6">
-                <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 p-2">
-                        <Crown className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">FindMy Admin</h2>
-                        <p className="text-xs text-slate-400">Super Admin Portal</p>
-                    </div>
-                </div>
-                {mobile && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-white hover:bg-slate-700"
-                    >
-                        <X className="h-5 w-5" />
-                    </Button>
-                )}
-            </div>
-
-            {/* Navigation */}
-            <nav className="flex-1 space-y-1 p-4">
-                <p className="px-3 py-2 text-xs font-semibold uppercase text-slate-400">
-                    Management
-                </p>
-                {navItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.href;
-                    return (
-                        <Link
-                            key={item.href}
-                            to={item.href}
-                            onClick={() => mobile && setMobileMenuOpen(false)}
-                            className={cn(
-                                "group relative flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium",
-                                "transition-all duration-200",
-                                isActive
-                                    ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30"
-                                    : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
-                            )}
-                        >
-                            <Icon className="h-5 w-5 flex-shrink-0" />
-                            <span className="flex-1">{item.label}</span>
-                            {item.badge && (
-                                <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                                    {item.badge}
-                                </span>
-                            )}
-                            {isActive && (
-                                <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                            )}
-                        </Link>
-                    );
-                })}
-            </nav>
-
-            {/* User Info */}
-            <div className="border-t border-slate-700 p-4">
-                <div className="mb-4 flex items-center gap-3 rounded-lg bg-slate-700/30 p-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
-                        <span className="text-sm font-bold text-white">
-                            {user?.name?.charAt(0).toUpperCase()}
-                        </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="truncate text-sm font-semibold">{user?.name}</p>
-                        <p className="truncate text-xs text-slate-400">Super Admin</p>
-                    </div>
-                </div>
-
-                {/* Logout Button */}
-                <Button
-                    onClick={handleLogout}
-                    className={cn(
-                        "w-full justify-center gap-2 rounded-lg",
-                        "bg-red-600 hover:bg-red-700 text-white",
-                        "transition-all duration-200"
-                    )}
-                >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                </Button>
-            </div>
+  const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
+    <div className="flex h-full flex-col bg-card border-r border-border">
+      {/* Logo */}
+      <div className={cn("flex h-16 items-center border-b border-border px-4", collapsed && !mobile ? "justify-center" : "gap-3")}>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+          FM
         </div>
-    );
+        {(!collapsed || mobile) && (
+          <span className="text-lg font-bold text-foreground tracking-tight">FindMy</span>
+        )}
+      </div>
 
-    return (
-        <div className="flex h-screen bg-slate-50">
-            {/* Desktop Sidebar */}
-            <aside className={cn(
-                "hidden md:flex flex-col transition-all duration-300",
-                sidebarOpen ? "w-72" : "w-20"
-            )}>
-                <Sidebar />
-            </aside>
+      {/* Nav */}
+      <nav className="flex-1 p-3 space-y-1">
+        {(!collapsed || mobile) && (
+          <p className="px-3 pb-2 pt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Menu
+          </p>
+        )}
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.href;
+          const hasBadge = item.href === "/admin/claims" && pendingClaims > 0;
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              onClick={() => mobile && setMobileOpen(false)}
+              className={cn(
+                "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+                collapsed && !mobile ? "justify-center" : "",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              )}
+            >
+              <Icon className="h-[18px] w-[18px] shrink-0" />
+              {(!collapsed || mobile) && <span className="flex-1">{item.label}</span>}
+              {hasBadge && (!collapsed || mobile) && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                  {pendingClaims}
+                </span>
+              )}
+              {hasBadge && collapsed && !mobile && (
+                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-destructive ring-2 ring-card" />
+              )}
+            </Link>
+          );
+        })}
+      </nav>
 
-            {/* Main Content Area */}
-            <div className="flex flex-1 flex-col">
-                {/* Desktop Header */}
-                <header className="hidden h-16 items-center justify-end border-b border-slate-200 bg-white px-6 shadow-sm lg:flex">
-                    <ThemeToggle />
-                </header>
-
-                {/* Mobile Header */}
-                <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm lg:hidden">
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="text-slate-700 hover:bg-slate-100"
-                        >
-                            {mobileMenuOpen ? (
-                                <X className="h-6 w-6" />
-                            ) : (
-                                <Menu className="h-6 w-6" />
-                            )}
-                        </Button>
-                        <div className="flex items-center gap-2">
-                            <div className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 p-1.5">
-                                <Crown className="h-4 w-4 text-white" />
-                            </div>
-                            <h1 className="text-lg font-bold text-slate-900">FindMy Admin</h1>
-                        </div>
-                    </div>
-                    <ThemeToggle />
-                </header>
-
-                {/* Mobile Sidebar */}
-                {mobileMenuOpen && (
-                    <div className="absolute top-16 left-0 right-0 z-50 bg-black/50 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
-                        <div onClick={(e) => e.stopPropagation()} className="h-[calc(100vh-4rem)] w-72 overflow-y-auto">
-                            <Sidebar mobile={true} />
-                        </div>
-                    </div>
-                )}
-
-                {/* Main Content */}
-                <main className="flex-1 overflow-auto">
-                    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-                        {children}
-                    </div>
-                </main>
+      {/* User footer */}
+      <div className="border-t border-border p-3 space-y-2">
+        <div className={cn("flex items-center gap-3 rounded-lg p-2", collapsed && !mobile ? "justify-center" : "")}>
+          <Avatar className="h-8 w-8 shrink-0">
+            <AvatarImage src={user?.avatar} alt={user?.name} />
+            <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+              {user?.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {(!collapsed || mobile) && (
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">{user?.name}</p>
+              <p className="truncate text-xs text-muted-foreground">Administrator</p>
             </div>
+          )}
         </div>
-    );
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          className={cn(
+            "w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10",
+            collapsed && !mobile ? "px-0" : "justify-start gap-2"
+          )}
+          size="sm"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          {(!collapsed || mobile) && <span>Sign out</span>}
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <aside className={cn(
+        "hidden md:flex flex-col transition-all duration-200 relative",
+        collapsed ? "w-[68px]" : "w-64"
+      )}>
+        <SidebarContent />
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-20 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm hover:text-foreground transition-colors"
+        >
+          {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        </button>
+      </aside>
+
+      {/* Main */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {/* Top bar */}
+        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">{currentPage?.label || "Admin"}</h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="hidden lg:flex relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search..." className="w-64 pl-9 h-9 bg-muted/50 border-0" />
+            </div>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-[18px] w-[18px]" />
+              {pendingClaims > 0 && (
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
+              )}
+            </Button>
+            <ThemeToggle />
+          </div>
+        </header>
+
+        {/* Mobile sidebar overlay */}
+        {mobileOpen && (
+          <div className="fixed inset-0 top-16 z-50 md:hidden" onClick={() => setMobileOpen(false)}>
+            <div className="absolute inset-0 bg-black/40" />
+            <div className="relative h-full w-64" onClick={(e) => e.stopPropagation()}>
+              <SidebarContent mobile />
+            </div>
+          </div>
+        )}
+
+        {/* Content */}
+        <main className="flex-1 overflow-auto">
+          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default AdminLayout;
