@@ -19,6 +19,8 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import MyClaims from "./pages/MyClaims";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminItems from "./pages/admin/AdminItems";
@@ -39,11 +41,14 @@ const App = () => (
               <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Landing />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/browse" element={<Browse />} />
                 <Route path="/item/:id" element={<ItemDetails />} />
+                <Route path="/item/:id/edit" element={<PostItem />} />
                 <Route path="/post" element={<PostItem />} />
                 <Route path="/messages" element={<Messages />} />
                 <Route path="/profile" element={<Profile />} />

@@ -28,9 +28,11 @@ export function Navbar() {
   };
 
   const navLinks = [
-    { href: "/browse", label: "Browse Items" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/messages", label: "Messages" },
+    { href: "/browse", label: "Browse Items", auth: true },
+    { href: "/dashboard", label: "Dashboard", auth: true },
+    { href: "/messages", label: "Messages", auth: true },
+    { href: "/about", label: "About", auth: false },
+    { href: "/contact", label: "Contact", auth: false },
   ];
 
   return (
@@ -50,18 +52,21 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            {isAuthenticated && navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.href
-                  ? "text-primary"
-                  : "text-muted-foreground"
-                  }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if (link.auth && !isAuthenticated) return null;
+              return (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.href
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                    }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right Section */}
